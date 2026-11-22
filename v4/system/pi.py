@@ -2,7 +2,7 @@
 """
 Daemon serial heartbeat + shutdown para el controlador ATX/ESP8266.
 
-CONTROLADOR DE PSU - VERSION 3 (etiqueta documental; no altera el protocolo).
+CONTROLADOR DE PSU - VERSION 4 (etiqueta documental; no altera el protocolo).
 
 Contrato (ver PROTOCOLO.md):
   - UART principal @ 9600 8N1, raw, \\n por linea
@@ -47,7 +47,7 @@ SERIAL_OPEN_SLEEP_S = 1.0
 
 ALIVE_PERIOD_MS = 500
 LOOP_SLEEP_S = 0.05
-PSU_CONTROLLER_VERSION = 3  # CONTROLADOR DE PSU v3
+PSU_CONTROLLER_VERSION = 4  # CONTROLADOR DE PSU v4
 
 
 # Al detectar reinicio (SIGTERM con reboot.target en marcha, etc.)

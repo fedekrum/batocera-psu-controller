@@ -1,18 +1,20 @@
-# Versión 2 (deprecated)
+# Versión 2 — ESP8266 por pines (deprecated)
 
-Archivos originales de la versión 2, conservados sin modificaciones como
-referencia histórica. **No usar en producción**: la versión actual es la v3,
-en `../v3/`.
+Prototipo en ESP8266 NodeMCU LoLin v3 con la **misma lógica por pines** que
+la v1 (todavía sin comunicación serial):
 
-- `esp8266.ino`: firmware original con comunicación serial, tiempos
-  hardcodeados y watchdog. Además es la entrada del generador
-  `../v3/tools/make_cfg_firmware.py`.
-- `pi.py`: daemon serial original de la Pi (17126 bytes), copia de rescate
-  de `SHARE/system/pi.py` antes de cualquier cambio. No conoce los avisos
-  `MODE BYPASS` / `MODE NORMAL` ni el flag `bypass_active`.
+- `power_on.ino`: prueba mínima, fuerza PSU y LED encendidos.
+- `esp_power.ino`: "versión final híbrida" (lógica Teensy o switch puro,
+  según `MOMENTARY_BUTTON`).
+- `esp_power2.ino`: clon de la lógica Teensy con switch permanente.
+- `RPi-power.py`: daemon con `lgpio`.
+  - `GPIO_HEARTBEAT = 14`: salida de heartbeat.
+  - `GPIO_SHUTDOWN = 4`: entrada de pedido de apagado.
+- Pines ESP: D1 botón, D2 PSU, D4 LED, D5 shutdown a la Pi, D7 alive de la Pi.
+- `diagrama_esp_rpi_psu.txt`: cableado.
+- `test_psu/`: prueba aislada de la PSU.
+- `com_test/` y `com_test/herramientas_diagnostico/`: emisores/receptores
+  A1/A2 y B1/B2, pruebas seriales C1/C2/C3 y su README.
 
-Historial:
-
-- v1: dos pines transmitiendo heartbeats, sin serial (sin código en el repo).
-- v2: estos archivos.
-- v3: firmware configurable con EEPROM, bypass y avisos a la Pi.
+Se conserva tal cual venía en `ESP8266.zip` (sin `__MACOSX` ni `.DS_Store`).
+No usar en producción: la versión actual es la v4.

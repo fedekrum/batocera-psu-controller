@@ -1,0 +1,72 @@
+Descripción: 
+Hay un ESP32 o ESP8266 siempre encendido con un boton momentaneo en GPIO4 para despertar y dormir la fuente de PC. 
+Este microcontrolador se conecta a un transistor por GPIO5 para amplificar la señal y así poder encender y apagar la fuente de PC; por GPIO2 usa el LED interno del board para indicar el estado de la fuente. 
+
+El encendido es simple ya que al despertar la fuente se enciende la raspberry.
+El apagado es mas complejo porque implica que el ESP haga 2 cosas:
+1- enviar una señal a la Raspberry Pi 5 para que esta se apague.
+2- debe detectar cuando se haya apagado efectivamente la Raspberry Pi 5 para apagar la fuente de PC.
+
+Por otro lado, si alguien apaga la raspberry manualmente con poweroff o desde la UI, tambien debe apagarse la fuente, asi que el control del estado de encendido de la raspberry va mas alla de si se apreto el boton o no.
+
+Diagrama:
+═════════════════════════════════
+
+
+            PC ATX PSU             ESP8266                     Button  
+            ┌──────────────┐       ┌──────────────────┐         ┌─────┐ 
+  220 AC  → │  +5VSB(VIO)  ├───────┤ VIN          GND ├─────────┤     │ 
+            │              │       │                  │         │     │ 
+            │    GND(BLK)  ├───────┤ GND           D1 ├─────────┤     │ 
+            │              │       │  │               │         └─────┘ 
+            │              │       │  │            D2 ├───────[2k]────┐
+            │              │       │  │            D5 ├───────┐       │
+            │              │       │  │               │       │       │
+            │              │       │  └─[5.1k]──── D7 ├────┐  │       │
+            │              │       ├───┐              │    │  │       │
+            │              │       │LED│ D4           │    │  │       │
+            │              │       └───┴──────────────┘    │  │       │
+            │              │                               │  │       │
+            │              │        Raspberry Pi 5         │  │       │
+            │              │       ┌────────────┐          │  │       │
+            │    +5V(RED)  ├───────┤ +5V        │          │  │       │
+            │              │       │            │          │  │       │
+            │    GND(BLK)  ├───────┤ GND  GPIO14├──────────┘  │       │
+            │              │       │            │             │       │
+            │              │       │      GPIO4 ├─────────────┘       │
+            │              │       └────────────┘                     │
+            │              │                                          │
+            │    GND(BLK)  ├──────────────────┐                       │
+            │              │                  │   ┌───────┐           │
+            │  PS_ON(GRN)  ├──────────────┐   │   │D882-Y │           │
+            └──────────────┘              │   │   │E  C  B│           │
+                                          │   │   │1  2  3│           │
+                                          │   │   └┬──┬──┬┘           │
+                                          │   └────┘  │  └────────────┘
+                                          └───────────┘
+
+
+Sketch ESP:
+esta en esp_power.ino 
+
+
+Raspberry Pi - Script Python:
+═════════════════════════════
+
+esta en RPi-power.py
+
+# Cómo ejecutar al iniciar (ejemplo en rc.local):
+# /usr/bin/python3 /usr/local/bin/teensy-power.py &
+# Con debug: /usr/bin/python3 /usr/local/bin/teensy-power.py -d &
+
+
+Elementos del diagrama:
+═══════════════════════
+
+Lineas:          ─ │
+Uniones:         ┬ ┴ ├ ┤
+Cruces:          ┼
+Esquinas:        ┌ ┐ └ ┘
+Esquinas dobles: ╔ ╗ ╚ ╝
+Lineas dobles:   ═ ║
+

@@ -1,6 +1,6 @@
 // ============================================================================
-// CONTROLADOR DE PSU - VERSION 3
-// v3: timeout ALIVE 60 s en EEPROM, avisos MODE BYPASS / MODE NORMAL,
+// CONTROLADOR DE PSU - VERSION 4
+// v4: timeout ALIVE 60 s en EEPROM, avisos MODE BYPASS / MODE NORMAL,
 //     CFG_SET de link bloqueado en bypass, LED con indicador de fallo,
 //     salida de bypass con llave OFF sin espera de 10 s.
 // Etiqueta documental: no cambia el binario ni el protocolo serial.

@@ -1,12 +1,13 @@
-# Controlador de PSU v3
+# Controlador de PSU v4
 
 Control de fuente ATX y apagado ordenado de una Raspberry Pi con Batocera
 mediante un ESP8266 (también compila en ESP32 / S2 / S3).
 
-El repo está separado por versiones: `v1/` (sin código conservado),
-`v2/` (deprecated) y `v3/` (versión actual, documentada abajo).
+El repo está separado por versiones: `v1/` (Teensy), `v2/` (prototipo
+ESP8266 por pines), `v3/` (firmware serial) y `v4/` (versión actual,
+documentada abajo).
 
-## Versión 3
+## Versión 4
 
 - `ALIVE_TIMEOUT_MS = 60000`, grabado en EEPROM (persistente).
 - Avisos `MODE BYPASS` / `MODE NORMAL` por la UART de pines para que la Pi
@@ -17,6 +18,9 @@ El repo está separado por versiones: `v1/` (sin código conservado),
 - LED: fade suave con PSU encendida, parpadeo rápido si la PSU no prendió.
 - Compila en `esp8266:esp8266:nodemcuv2`, `esp32:esp32:esp32`,
   `esp32:esp32:esp32s2` y `esp32:esp32:esp32s3`.
+
+`CFG_VERSION = 4` es la versión del esquema de configuración guardado en
+EEPROM; no confundir con la versión del controlador (v4).
 
 ## Hardware
 
@@ -50,8 +54,7 @@ terminara de desmontar.
 
 Comandos por serial: `CFG`, `CFG_GET <key>`, `CFG_SET <key>=<value>`,
 `CFG_SAVE`, `CFG_LOAD`, `CFG_RESET`. Los cambios de backend, pines o baud
-requieren reinicio. Los valores se guardan en la EEPROM interna de la
-ESP (`CFG_VERSION = 4`).
+requieren reinicio. Los valores se guardan en la EEPROM interna de la ESP.
 
 ## Instalar `pi.py` en Batocera
 
@@ -64,9 +67,9 @@ daemon va en `/userdata/system/pi.py` (en la PC, con la SD montada, es
 ```sh
 # ajustar el punto de montaje según tu usuario
 SHARE=/run/media/fede/SHARE
-cp v3/system/pi.py "$SHARE/system/pi.py"
+cp v4/system/pi.py "$SHARE/system/pi.py"
 chmod +x "$SHARE/system/pi.py"
-grep 'VERSION 3' "$SHARE/system/pi.py"   # verificación
+grep 'VERSION 4' "$SHARE/system/pi.py"   # verificación
 ```
 
 Después desmonta y expulsa la SD con `udisksctl` antes de llevársela a la Pi.
@@ -74,14 +77,14 @@ Después desmonta y expulsa la SD con `udisksctl` antes de llevársela a la Pi.
 ### Desde SSH en la Pi
 
 ```sh
-scp v3/system/pi.py root@<IP-de-la-Pi>:/userdata/system/pi.py
+scp v4/system/pi.py root@<IP-de-la-Pi>:/userdata/system/pi.py
 ssh root@<IP-de-la-Pi> 'chmod +x /userdata/system/pi.py'
 ssh root@<IP-de-la-Pi> reboot
 ```
 
 ### Launcher (necesario para que arranque)
 
-`v3/system/custom_service` es el script que lanza el daemon:
+`v4/system/custom_service` es el script que lanza el daemon:
 
 ```
 /userdata/system/services/custom_service
@@ -117,12 +120,12 @@ correcto y que el launcher esté ejecutable.
 arduino-cli compile \
   --fqbn esp8266:esp8266:nodemcuv2 \
   --build-path /tmp/opencode/build-esp8266-esp8266-nodemcuv2 \
-  v3/esp8266_cfg
+  v4/esp8266_cfg
 
 arduino-cli upload -p /dev/ttyUSB0 \
   --fqbn esp8266:esp8266:nodemcuv2 \
   --build-path /tmp/opencode/build-esp8266-esp8266-nodemcuv2 \
-  v3/esp8266_cfg
+  v4/esp8266_cfg
 ```
 
 Usar siempre `--build-path` explícito para evitar colisiones de caché entre
@@ -132,35 +135,50 @@ familias.
 
 ### `v1/`
 
-- `README.md`: única referencia disponible; no se conservó código.
+- `teensy_power.ino`: controlador Teensy 3.0, dos pines (heartbeat y
+  shutdown), sin serial.
+- `RPi-power.py`: daemon con `lgpio`, GPIO18 heartbeat / GPIO17 shutdown.
+- `diagrama_teensy_rpi_psu.txt`: cableado.
 
 ### `v2/` (deprecated)
 
-- `esp8266.ino`: firmware v2 original, sin modificaciones. No flashear.
-- `pi.py`: daemon v2 original (copia de rescate de la SD), sin los avisos
-  de bypass de la v3. Solo referencia histórica.
+Prototipo en ESP8266 con la misma lógica por pines (D5/D7), todavía sin
+serial:
+
+- `power_on.ino`: prueba mínima de encendido.
+- `esp_power.ino`, `esp_power2.ino`: versiones de la lógica Teensy en ESP.
+- `RPi-power.py`: `lgpio`, GPIO14 heartbeat / GPIO4 shutdown.
+- `diagrama_esp_rpi_psu.txt`, `test_psu/`, `com_test/` y
+  `com_test/herramientas_diagnostico/`.
+
+### `v3/` (deprecated)
+
+- `esp8266.ino`: firmware con comunicación serial, tiempos hardcodeados y
+  watchdog. No flashear.
+- `pi.py`: daemon serial original (copia de rescate de la SD).
 - `README.md`: detalle de la versión.
 
-### `v3/` (actual)
+### `v4/` (actual)
 
-- `v3/esp8266_cfg/esp8266_cfg.ino`: firmware generado.
-- `v3/esp8266_cfg/cfg_types.h`: tipos, defines y plataformas.
-- `v3/tools/make_cfg_firmware.py`: generador del firmware. Lee el firmware
-  v2 (`/home/fede/pacman/ESP8266/esp8266.ino`, guardado acá en
-  `v2/esp8266.ino`) y escribe `v3/esp8266_cfg/esp8266_cfg.ino`. Las rutas
+- `v4/esp8266_cfg/esp8266_cfg.ino`: firmware generado.
+- `v4/esp8266_cfg/cfg_types.h`: tipos, defines y plataformas.
+- `v4/tools/make_cfg_firmware.py`: generador. Lee el firmware v3
+  (`/home/fede/pacman/ESP8266/esp8266.ino`, guardado acá en
+  `v3/esp8266.ino`) y escribe `v4/esp8266_cfg/esp8266_cfg.ino`. Las rutas
   `SRC`/`DST` son absolutas; ajustarlas si se usa en otra máquina.
-- `v3/system/pi.py`: daemon serial de la Pi (en la SD:
+- `v4/system/pi.py`: daemon serial de la Pi (en la SD:
   `SHARE/system/pi.py`).
-- `v3/system/custom_service`: launcher Batocera (en la SD:
+- `v4/system/custom_service`: launcher Batocera (en la SD:
   `SHARE/system/services/custom_service`).
 
 ## Historial
 
-- **v1**: versión inicial, muy básica: dos pines que transmitían
-  heartbeats, sin comunicación serial.
-- **v2** (`v2/`): firmware y `pi.py` originales con serial, tiempos
-  hardcodeados y watchdog. **Deprecated**, reemplazado por v3.
-- **v3** (esta versión): configuración por comandos `CFG_*`, persistencia
+- **v1**: Teensy 3.0, dos pines con heartbeats, sin serial.
+- **v2**: prototipo ESP8266 con la misma lógica por pines (D5/D7), sin
+  serial. **Deprecated**.
+- **v3**: firmware ESP8266 con serial (tiempos hardcodeados y watchdog) y
+  su `pi.py`. **Deprecated**, reemplazado por v4.
+- **v4** (esta versión): configuración por comandos `CFG_*`, persistencia
   en EEPROM, modo bypass por FLASH, avisos a la Pi, indicador de fallo en
   el LED y timeout de 60 s para asegurar apagados limpios de la SD.
   El timeout se probó en 30 s y 20 s antes de fijarse en 60 s.
