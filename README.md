@@ -71,17 +71,21 @@ familias.
 
 - `esp8266_cfg/esp8266_cfg.ino`: firmware generado.
 - `esp8266_cfg/cfg_types.h`: tipos, defines y plataformas.
-- `tools/make_cfg_firmware.py`: generador del firmware. Lee
-  `reference/esp8266.ino` y escribe `esp8266_cfg/esp8266_cfg.ino`.
-  Las rutas `SRC`/`DST` son absolutas (originalmente bajo
-  `/home/fede/pacman/ESP8266`); ajustarlas si se usa en otra máquina.
+- `tools/make_cfg_firmware.py`: generador del firmware. Lee el firmware v2
+  (`/home/fede/pacman/ESP8266/esp8266.ino`, guardado acá en
+  `v2-deprecated/esp8266.ino`) y escribe `esp8266_cfg/esp8266_cfg.ino`.
+  Las rutas `SRC`/`DST` son absolutas; ajustarlas si se usa en otra máquina.
 - `system/pi.py`: daemon serial de la Pi (en la SD: `SHARE/system/pi.py`).
-- `reference/esp8266.ino`: firmware original, sin modificaciones.
+- `v2-deprecated/esp8266.ino`: firmware v2 original, sin modificaciones.
+  Se conserva solo como referencia histórica; no se debe flashear.
 
 ## Historial
 
-- v1: firmware original con tiempos hardcodeados (timeout inicial 5 s).
-- v2: configuración por comandos `CFG_*`, persistencia en EEPROM y modo
-  bypass por FLASH. Timeout probado en 30 s y 20 s.
-- v3: correcciones de bypass, avisos a la Pi, indicador de fallo en el LED
-  y timeout de 60 s para asegurar apagados limpios de la SD.
+- **v1**: versión inicial, muy básica: dos pines que transmitían
+  heartbeats, sin comunicación serial.
+- **v2** (`v2-deprecated/esp8266.ino`): firmware original con serial,
+  tiempos hardcodeados y watchdog. **Deprecated**, reemplazado por v3.
+- **v3** (esta versión): configuración por comandos `CFG_*`, persistencia
+  en EEPROM, modo bypass por FLASH, avisos a la Pi, indicador de fallo en
+  el LED y timeout de 60 s para asegurar apagados limpios de la SD.
+  El timeout se probó en 30 s y 20 s antes de fijarse en 60 s.
