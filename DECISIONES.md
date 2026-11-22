@@ -60,6 +60,29 @@ como están.
   enlace conmute a USB e ignora `POWEROFF_REQ` mientras tanto. Los
   `CFG_SET` de backend/pines/baud se rechazan con `CFG_ERR bypass active`.
 
+## 2026-11-22 — v4.1: un solo firmware para cinco placas
+
+- **Decisión**: crear `v4.1/` con un único `firmware.ino` para ESP8266,
+  ESP32, ESP32-S2, ESP32-S3 y Teensy 3.0, con las diferencias de hardware
+  concentradas en `firmware/boards.h`. No tocar v4, v1.1 ni v1.
+- **Por qué**: v4 ya compilaba en cuatro placas mediante un generador y
+  v1.1 era una copia escrita a mano del mismo protocolo. Mantener dos
+  fuentes de verdad para una misma lógica era innecesario y ya había
+  generado divergencia: v4 tiene 30000 compilado con 60000 grabado a mano,
+  v1.1 nace con 60000.
+- **Timeout**: 60000 ms como default compilado en **todas** las placas. Es
+  el margen que evita la corrupción de SD; nunca bajarlo.
+- **EEPROM**: se sube el esquema a 5 (se agrega `bypassPin`) y se usa un
+  magic distinto por familia. Una configuración de v4 no se lee en v4.1,
+  pero los defaults ya traen 60 s, así que no se pierde el margen.
+- **Bypass**: deja de ser un pin fijo; pasa a `BYPASS_PIN` con default
+  GPIO0 en ESP y pin 6 en Teensy. Así el modo configuración funciona igual
+  en las cinco placas.
+- **Generador**: v4.1 no tiene generador. El de v4 queda como histórico;
+  de acá en adelante se mantiene un solo archivo de firmware.
+- **Estado**: compila en los cinco FQBN. No se flasheó ni se probó en
+  hardware; no se tocó la SD.
+
 ## 2026-11-22 — v1.1: v4 en Teensy 3.0
 
 - **Decisión**: crear `v1.1/` con la lógica de v4 portada a Teensy 3.0,

@@ -6,8 +6,9 @@ mediante un ESP8266 (también compila en ESP32 / S2 / S3) o un Teensy 3.0.
 El repo está separado por versiones: `v1/` (Teensy, **en servicio en un
 arcade**), `v1.1/` (v4 portada a Teensy 3.0, **compilada pero sin probar en
 hardware**), `v2/` (prototipo ESP8266 por pines, deprecated), `v3/`
-(firmware serial, deprecated) y `v4/` (versión actual sobre ESP,
-documentada abajo).
+(firmware serial, deprecated), `v4/` (versión actual sobre ESP) y `v4.1/`
+(un solo firmware para las cinco placas, **compilado pero sin probar en
+hardware**; documentado abajo).
 
 ## Índice rápido
 
@@ -15,7 +16,7 @@ documentada abajo).
 |---|---|
 | Contexto general, reglas y estado del proyecto (empieza acá si sos una IA/agente) | `AGENTS.md` |
 | Por qué se tomaron las decisiones sensibles (60 s, numeración, bypass) | `DECISIONES.md` |
-| Cableado, mensajes y timeouts de una versión | `v1/`, `v1.1/`, `v2/`, `v3/` o `v4/` → `PROTOCOLO.md` |
+| Cableado, mensajes y timeouts de una versión | `v1/`, `v1.1/`, `v2/`, `v3/`, `v4/` o `v4.1/` → `PROTOCOLO.md` |
 | Instalación en Batocera y comandos de build/flash | este README, abajo |
 | Histórico y estado de cada versión | este README, "Historial" |
 
@@ -48,6 +49,21 @@ reemplaza a `v1/`, que sigue en servicio en el arcade original.
 - Compila con `teensy:avr:teensy30`. Ver `v1.1/README.md` y
   `v1.1/PROTOCOLO.md`. **No probada en hardware.**
 
+## Versión 4.1 (multiplaca)
+
+Un solo firmware para **ESP8266, ESP32, ESP32-S2, ESP32-S3 y Teensy 3.0**,
+con el protocolo de v4/v1.1 y una sola copia de `pi.py`. Es aditiva: no
+modifica v4, v1.1 ni v1.
+
+- `firmware/boards.h` concentra las diferencias de hardware (pines,
+  polaridad del LED, EEPROM y tipo de enlace).
+- `ALIVE_TIMEOUT_MS = 60000` de fábrica en todas las placas.
+- Bypass configurable con `BYPASS_PIN` (GPIO0 en ESP, pin 6 en Teensy).
+- Esquema EEPROM 5: una configuración de v4 no se lee, pero los defaults
+  ya traen 60 s.
+- Compilada para las cinco placas. **No probada en hardware.** Ver
+  `v4.1/README.md` y `v4.1/PROTOCOLO.md`.
+
 ## Hardware
 
 ESP8266 NodeMCU LoLin v3:
@@ -72,12 +88,14 @@ cambia es el significado de esas dos líneas en el lado de la Pi: en v2 son
 
 Cada versión tiene su propio `PROTOCOLO.md`, porque la lógica cambia:
 `v1/PROTOCOLO.md` (Teensy, 2 GPIO), `v1.1/PROTOCOLO.md` (Teensy, UART),
-`v2/PROTOCOLO.md` (ESP8266 por pines), `v3/PROTOCOLO.md` (UART) y
-`v4/PROTOCOLO.md` (UART configurable, EEPROM y bypass). Los dos últimos se
-tomaron como referencia de los `PROTOCOLO.md` del zip `PSU PC para mis
-arcades.zip`, adaptados al código real de cada versión; v1.1 deriva de v4.
+`v2/PROTOCOLO.md` (ESP8266 por pines), `v3/PROTOCOLO.md` (UART),
+`v4/PROTOCOLO.md` (UART configurable, EEPROM y bypass) y
+`v4.1/PROTOCOLO.md` (las cinco placas, perfiles por hardware). Los de v3 y
+v4 se tomaron como referencia de los `PROTOCOLO.md` del zip
+`PSU PC para mis arcades.zip`, adaptados al código real de cada versión;
+v1.1 deriva de v4 y v4.1 unifica v4 y v1.1.
 
-Resumen del enlace serial (v1.1/v3/v4): 9600 8N1, línea por mensaje
+Resumen del enlace serial (v1.1/v3/v4/v4.1): 9600 8N1, línea por mensaje
 terminada en `\n`.
 
 Pi -> ESP: `BOOT_OK`, `ALIVE seq=N uptime=N`, `BYE reason=...`, `PONG`,
@@ -177,6 +195,9 @@ arduino-cli compile --fqbn teensy:avr:teensy30 \
   --build-path /tmp/opencode/build-teensy30 v1.1/teensy_cfg
 ```
 
+Para v4.1 hay un solo directorio (`v4.1/firmware`) y cinco FQBN; los
+comandos están en `v4.1/README.md`.
+
 Usar siempre `--build-path` explícito para evitar colisiones de caché entre
 familias. No se hace `upload`: hace falta el cargador HalfKay y una placa,
 y no hay ninguna conectada.
@@ -205,6 +226,14 @@ Puerto de v4 a Teensy 3.0:
 - `system/custom_service`: launcher Batocera.
 - `diagrama_teensy_v1_psu.txt`: cableado y cambios frente a v1.
 - `PROTOCOLO.md`: contrato UART del Teensy.
+
+### `v4.1/` (compilada en cinco placas, sin probar en hardware)
+
+- `firmware/firmware.ino`: firmware único, lógica común.
+- `firmware/boards.h`: perfiles de placa (pines, polaridad, EEPROM, magic).
+- `firmware/cfg_types.h`: esquema EEPROM 5.
+- `system/pi.py` y `system/custom_service`: daemon y launcher.
+- `PROTOCOLO.md`: contrato y tabla de perfiles.
 
 ### `v2/` (deprecated)
 
@@ -256,7 +285,10 @@ serial:
   serial. **Deprecated**.
 - **v3**: firmware ESP8266 con serial (tiempos hardcodeados y watchdog) y
   su `pi.py`. **Deprecated**, reemplazado por v4.
-- **v4** (esta versión): configuración por comandos `CFG_*`, persistencia
-  en EEPROM, modo bypass por FLASH, avisos a la Pi, indicador de fallo en
-  el LED y timeout de 60 s para asegurar apagados limpios de la SD.
-  El timeout se probó en 30 s y 20 s antes de fijarse en 60 s.
+- **v4**: configuración por comandos `CFG_*`, persistencia en EEPROM, modo
+  bypass por FLASH, avisos a la Pi, indicador de fallo en el LED y timeout
+  de 60 s para asegurar apagados limpios de la SD. El timeout se probó en
+  30 s y 20 s antes de fijarse en 60 s.
+- **v4.1**: un solo firmware para las cinco placas con `boards.h`, bypass
+  configurable y 60 s de fábrica. Compilada en las cinco variantes,
+  **sin probar en hardware**. Es la línea a mantener de acá en adelante.
