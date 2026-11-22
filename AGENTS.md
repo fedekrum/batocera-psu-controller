@@ -18,66 +18,80 @@ de una fuente ATX y hace tres cosas:
 
 Hay cuatro líneas de desarrollo:
 
-- **v1**: Teensy 3.0 con dos GPIO. **Sigue en producción** en un arcade del
+- **v1.1**: Teensy 3.0 con dos GPIO. **Sigue en producción** en un arcade del
   usuario. No está deprecated.
-- **v1.1**: la misma lógica de v4 en Teensy 3.0. Compila, **sin probar en
-  hardware**. No reemplaza a v1.
-- **v4**: firmware configurable con ESP8266/ESP32. Es la línea activa sobre
+- **v1.1.1-beta**: la misma lógica de v1.4 en Teensy 3.0. Compila, **sin probar en
+  hardware**. No reemplaza a v1.1.
+- **v1.4**: firmware configurable con ESP8266/ESP32. Es la línea activa sobre
   ESP.
-- **v4.1**: un solo firmware para las cinco placas. Compila en todas,
+- **v1.5-beta**: un solo firmware para las cinco placas. Compila en todas,
   **sin probar en hardware**. Es la línea a mantener de acá en adelante.
-  Default de botón = llave (v4) en todas; `BUTTON_TYPE=0` habilita el
-  pulsador momentáneo de v1 en cualquier placa, con sus tiempos ya
+  Default de botón = llave (v1.4) en todas; `BUTTON_TYPE=0` habilita el
+  pulsador momentáneo de v1.1 en cualquier placa, con sus tiempos ya
   configurados (`MOMENTARY_*`).
 
-v2 y v3 son históricas/deprecated, pero se conservan porque explican la
-evolución y porque v3 es la fuente del generador de v4.
+v1.2 y v1.3 son históricas/deprecated, pero se conservan porque explican la
+evolución y porque v1.3 es la fuente del generador de v1.4.
 
 ## 2. Mapa de versiones
 
+Renumeración del 2026-11-22 (los nombres viejos pueden aparecer en commits
+y documentos anteriores):
+
+| Antes | Ahora |
+|---|---|
+| `v1/` | `v1.1/` |
+| `v1.1/` | `v1.1.1-beta/` |
+| `v2/` | `v1.2/` |
+| `v3/` | `v1.3/` |
+| `v4/` | `v1.4/` |
+| `v4.1/` | `v1.5-beta/` |
+
+No existe `v5/`: «la 5» es `v1.5-beta/` (antes `v4.1/`).
+
 | Dir | Estado | Micro | Comunicación con la Pi | Archivo clave |
 |---|---|---|---|---|
-| `v1/` | **en servicio** | Teensy 3.0 | 2 GPIO: GPIO18 heartbeat, GPIO17 shutdown | `teensy_power.ino`, `RPi-power.py`, `PROTOCOLO.md` |
-| `v1.1/` | compilada, sin probar | Teensy 3.0 | Serial1 pins 0/1 (UART3 en la Pi), bypass pin 6 | `teensy_cfg/`, `system/`, `PROTOCOLO.md` |
-| `v2/` | deprecated | ESP8266 | 2 GPIO: GPIO14 → D7 alive, D5 → GPIO4 shutdown | `esp_power.ino`, `esp_power2.ino`, `PROTOCOLO.md` |
-| `v3/` | deprecated, **fuente** | ESP8266 | UART 9600, `BOOT_OK`/`ALIVE`/`BYE` | `esp8266.ino`, `pi.py`, `PROTOCOLO.md` |
-| `v4/` | activa sobre ESP | ESP8266 / ESP32 / S2 / S3 | UART 9600 + `CFG_*` + bypass | `esp8266_cfg/`, `system/`, `PROTOCOLO.md` |
-| `v4.1/` | **a mantener** | las cinco placas | UART 9600, perfil por placa en `boards.h` | `firmware/`, `system/`, `PROTOCOLO.md` |
+| `v1.1/` | **en servicio** | Teensy 3.0 | 2 GPIO: GPIO18 heartbeat, GPIO17 shutdown | `teensy_power.ino`, `RPi-power.py`, `PROTOCOLO.md` |
+| `v1.1.1-beta/` | compilada, sin probar | Teensy 3.0 | Serial1 pins 0/1 (UART3 en la Pi), bypass pin 6 | `teensy_cfg/`, `system/`, `PROTOCOLO.md` |
+| `v1.2/` | deprecated | ESP8266 | 2 GPIO: GPIO14 → D7 alive, D5 → GPIO4 shutdown | `esp_power.ino`, `esp_power2.ino`, `PROTOCOLO.md` |
+| `v1.3/` | deprecated, **fuente** | ESP8266 | UART 9600, `BOOT_OK`/`ALIVE`/`BYE` | `esp8266.ino`, `pi.py`, `PROTOCOLO.md` |
+| `v1.4/` | activa sobre ESP | ESP8266 / ESP32 / S2 / S3 | UART 9600 + `CFG_*` + bypass | `esp8266_cfg/`, `system/`, `PROTOCOLO.md` |
+| `v1.5-beta/` | **a mantener** | las cinco placas | UART 9600, perfil por placa en `boards.h` | `firmware/`, `system/`, `PROTOCOLO.md` |
 
 Cada carpeta tiene su propio `PROTOCOLO.md` y su diagrama; no asumir que
 el protocolo de una versión aplica a otra (los roles de D5/D7 cambian).
 
 ## 3. Fuentes de verdad y reglas duras
 
-- **`v3/esp8266.ino` y `v3/pi.py` son originales históricos.** No editar.
-  El firmware v3 se usa como entrada del generador de v4; su hash debe
+- **`v1.3/esp8266.ino` y `v1.3/pi.py` son originales históricos.** No editar.
+  El firmware v1.3 se usa como entrada del generador de v1.4; su hash debe
   permanecer `9f3927e16025241a8c1923464cf5a8136d0e77de2ab7a0d63c92f50776801079`.
-- **Los archivos en `v4/esp8266_cfg/` son generados.** No editarlos a mano:
-  cambiar `v4/tools/make_cfg_firmware.py`, regenerar y copiar el resultado.
+- **Los archivos en `v1.4/esp8266_cfg/` son generados.** No editarlos a mano:
+  cambiar `v1.4/tools/make_cfg_firmware.py`, regenerar y copiar el resultado.
   El generador escribe tanto `esp8266_cfg.ino` como `cfg_types.h`.
 - **No bajar el timeout de 60 s.** Con 20 s y 30 s se corrompió la SD porque
   la ESP cortaba antes de que la Pi terminara de desmontar. El valor
   persistido en la EEPROM es `ALIVE_TIMEOUT_MS=60000`.
 - **No reflashear hardware ni modificar la SD sin pedido explícito.** La SD
   estuvo corrupta y fue reparada; el usuario decide cuándo se intervene.
-- **v1 no se toca**: es el software que corre hoy en el arcade Teensy.
-- **`v1.1/teensy_cfg/` es código escrito a mano**, no generado: se edita
-  directamente. Comparte protocolo con v4, pero no su generador.
+- **v1.1 no se toca**: es el software que corre hoy en el arcade Teensy.
+- **`v1.1.1-beta/teensy_cfg/` es código escrito a mano**, no generado: se edita
+  directamente. Comparte protocolo con v1.4, pero no su generador.
 - **El Teensy 3.0 no tolera 5 V**: sus señales son 3,3 V. Serial1 está en
   pines fijos 0 (RX) y 1 (TX); no se pueden remapear por `CFG_SET`.
-- **`v4.1/firmware/` es código escrito a mano**, con un solo `firmware.ino`
+- **`v1.5-beta/firmware/` es código escrito a mano**, con un solo `firmware.ino`
   para las cinco placas. Las diferencias van en `boards.h`, no en copias
   del firmware. No tiene generador. Si se cambia el protocolo, actualizar
-  `v4.1/PROTOCOLO.md` en el mismo commit.
+  `v1.5-beta/PROTOCOLO.md` en el mismo commit.
 - El repo es **privado**. No publicar.
 
-## 4. Flujo de apagado (v4 / v1.1 / v4.1, el importante)
+## 4. Flujo de apagado (v1.4 / v1.1.1-beta / v1.5-beta, el importante)
 
 ```
 Llave OFF / pulsación
   -> controlador envía POWEROFF_REQ
-       (v4: D5/D7; v1.1: Serial1 pines 0/1;
-        v4.1: enlace de pines según boards.h)
+       (v1.4: D5/D7; v1.1.1-beta: Serial1 pines 0/1;
+        v1.5-beta: enlace de pines según boards.h)
   -> pi.py responde BYE reason=... , escribe traza con fsync, drena UART
   -> Pi ejecuta batocera-es-swissknife --shutdown (fallback shutdown -h now)
   -> controlador espera ALIVE_TIMEOUT_MS (60 s) y corta la PSU por watchdog
@@ -89,8 +103,8 @@ Otros caminos:
   (60+60 s): corte con LED código 1.
 - Pérdida de `ALIVE` tras boot: corte con LED código 2.
 - `QUIET seconds=N` de la Pi: suspende el watchdog durante un reboot.
-- Bypass: entra/sale con **botón FLASH (GPIO0/D3)** en v4, **pin 6** en
-  v1.1 o `BYPASS_PIN` configurable en v4.1 (PSU ON fija, watchdog off,
+- Bypass: entra/sale con **botón FLASH (GPIO0/D3)** en v1.4, **pin 6** en
+  v1.1.1-beta o `BYPASS_PIN` configurable en v1.5-beta (PSU ON fija, watchdog off,
   link USB, LED fade 2 s, RAM only). Avisa `MODE BYPASS` / `MODE NORMAL`
   por el enlace de pines; la Pi ignora `POWEROFF_REQ` mientras dure.
 
@@ -100,47 +114,47 @@ Otros caminos:
 README.md                 guía humana: instalación, build, archivos
 AGENTS.md                 este archivo
 DECISIONES.md             por qué se hizo cada cambio sensible
-v1/ ... v4/               una carpeta por versión, con README + PROTOCOLO
-  diagrama_*.txt          cableado (v2/v3/v4 comparten el de ESP8266)
+v1.1/ ... v1.5-beta/          una carpeta por versión, con README + PROTOCOLO
+  diagrama_*.txt          cableado (v1.2/v1.3/v1.4 comparten el de ESP8266)
   PROTOCOLO.md            contrato eléctrico, mensajes y timeouts
-v1.1/teensy_cfg/          firmware v1.1 escrito a mano, NO generado
-v1.1/system/pi.py         mismo daemon que v4, textos adaptados
-v1.1/diagrama_teensy_*    cableado Teensy 3.0 + Pi (pines 0/1, bypass 6)
-v4.1/firmware/firmware.ino  firmware UNICO de las cinco placas
-v4.1/firmware/boards.h    perfiles: pines, polaridad, EEPROM, magic
-v4.1/firmware/cfg_types.h esquema EEPROM 5
-v4.1/system/pi.py         daemon unico, mismo protocolo que v4
-v3/esp8266.ino            firmware original, entrada del generador
-v3/pi.py                  daemon serial original (rescate)
-v4/esp8266_cfg/           firmware v4 GENERADO (.ino + cfg_types.h)
-v4/tools/                 generador: transforma v3 -> v4
-v4/system/pi.py           daemon que se instala en /userdata/system/pi.py
-v4/system/custom_service  launcher Batocera
-v2/com_test/              herramientas de diagnóstico de la capa física
+v1.1.1-beta/teensy_cfg/          firmware v1.1.1-beta escrito a mano, NO generado
+v1.1.1-beta/system/pi.py         mismo daemon que v1.4, textos adaptados
+v1.1.1-beta/diagrama_teensy_*    cableado Teensy 3.0 + Pi (pines 0/1, bypass 6)
+v1.5-beta/firmware/firmware.ino  firmware UNICO de las cinco placas
+v1.5-beta/firmware/boards.h    perfiles: pines, polaridad, EEPROM, magic
+v1.5-beta/firmware/cfg_types.h esquema EEPROM 5
+v1.5-beta/system/pi.py         daemon unico, mismo protocolo que v1.4
+v1.3/esp8266.ino            firmware original, entrada del generador
+v1.3/pi.py                  daemon serial original (rescate)
+v1.4/esp8266_cfg/           firmware v1.4 GENERADO (.ino + cfg_types.h)
+v1.4/tools/                 generador: transforma v1.3 -> v1.4
+v1.4/system/pi.py           daemon que se instala en /userdata/system/pi.py
+v1.4/system/custom_service  launcher Batocera
+v1.2/com_test/              herramientas de diagnóstico de la capa física
 ```
 
 ## 6. Cómo trabajar
 
 1. Leer el `PROTOCOLO.md` de la versión que se va a tocar.
-2. Cambios de firmware v4: editar `v4/tools/make_cfg_firmware.py` →
-   ejecutarlo → copiar los dos archivos generados a `v4/esp8266_cfg/` →
-   actualizar `v4/PROTOCOLO.md` si cambia el protocolo.
-   Cambios de v1.1: editar `v1.1/teensy_cfg/` directamente (no hay
-   generador) y actualizar `v1.1/PROTOCOLO.md`.
-   Cambios de v4.1: editar `v4.1/firmware/firmware.ino` (o `boards.h` si
-   cambia un default de placa) y actualizar `v4.1/PROTOCOLO.md`.
+2. Cambios de firmware v1.4: editar `v1.4/tools/make_cfg_firmware.py` →
+   ejecutarlo → copiar los dos archivos generados a `v1.4/esp8266_cfg/` →
+   actualizar `v1.4/PROTOCOLO.md` si cambia el protocolo.
+   Cambios de v1.1.1-beta: editar `v1.1.1-beta/teensy_cfg/` directamente (no hay
+   generador) y actualizar `v1.1.1-beta/PROTOCOLO.md`.
+   Cambios de v1.5-beta: editar `v1.5-beta/firmware/firmware.ino` (o `boards.h` si
+   cambia un default de placa) y actualizar `v1.5-beta/PROTOCOLO.md`.
 3. Validación rápida:
    ```sh
-   python3 -m py_compile v4/system/pi.py v4/tools/make_cfg_firmware.py
-   python3 -m py_compile v1.1/system/pi.py v4.1/system/pi.py
+   python3 -m py_compile v1.4/system/pi.py v1.4/tools/make_cfg_firmware.py
+   python3 -m py_compile v1.1.1-beta/system/pi.py v1.5-beta/system/pi.py
    arduino-cli compile --fqbn esp8266:esp8266:nodemcuv2 \
-     --build-path /tmp/opencode/build-esp8266-esp8266-nodemcuv2 v4/esp8266_cfg
+     --build-path /tmp/opencode/build-esp8266-esp8266-nodemcuv2 v1.4/esp8266_cfg
    arduino-cli compile --fqbn teensy:avr:teensy30 \
-     --build-path /tmp/opencode/build-teensy30 v1.1/teensy_cfg
+     --build-path /tmp/opencode/build-teensy30 v1.1.1-beta/teensy_cfg
    ```
-   Compilar v4 también con `esp32:esp32:esp32`, `esp32:esp32:esp32s2` y
-   `esp32:esp32:esp32s3`. Para v4.1 compilar los cinco FQBN contra
-   `v4.1/firmware` (ver `v4.1/README.md`). Usar siempre `--build-path`
+   Compilar v1.4 también con `esp32:esp32:esp32`, `esp32:esp32:esp32s2` y
+   `esp32:esp32:esp32s3`. Para v1.5-beta compilar los cinco FQBN contra
+   `v1.5-beta/firmware` (ver `v1.5-beta/README.md`). Usar siempre `--build-path`
    explícito.
 4. Monitor serial: 9600 8N1. En Linux `/dev/ttyUSB0` puede requerir
    `newgrp uucp` o `pkexec`. Para grabar el Teensy hace falta
@@ -149,21 +163,21 @@ v2/com_test/              herramientas de diagnóstico de la capa física
 ## 7. Estado verificado (2026-11-22)
 
 - Repo privado, rama `main`, todo pusheado.
-- v1.1 compila para `teensy:avr:teensy30` (Teensyduino 1.62.0), sin
+- v1.1.1-beta compila para `teensy:avr:teensy30` (Teensyduino 1.62.0), sin
   flashear ni probar en hardware. `teensy-loader-cli` no está instalado.
-- v4.1 compila en las cinco placas (`nodemcuv2`, `esp32`, `esp32s2`,
+- v1.5-beta compila en las cinco placas (`nodemcuv2`, `esp32`, `esp32s2`,
   `esp32s3`, `teensy30`), sin flashear ni probar en hardware.
-- ESP8266 NodeMCU LoLin v3 con v4 flasheada; EEPROM confirmada en 60 s
+- ESP8266 NodeMCU LoLin v3 con v1.4 flasheada; EEPROM confirmada en 60 s
   durante cinco arranques (`RX CFG_ACK ALIVE_TIMEOUT_MS=60000`).
 - SD reparada (`e2fsck` + `fsck.vfat`), limpia y ejectada; contiene 18171
-  roms, 78 saves y el `pi.py` v4 instalado. Copia de rescate del daemon
+  roms, 78 saves y el `pi.py` v1.4 instalado. Copia de rescate del daemon
   original en `/home/fede/pacman/SHARE/system/pi.py`.
 - No hay tests automatizados: las pruebas son compilación + monitor serial
   + ciclos reales de encendido/apagado.
 
 ## 8. Deuda y referencias no incluidas
 
-- `v4/tools/make_cfg_firmware.py` usa rutas **absolutas**
+- `v1.4/tools/make_cfg_firmware.py` usa rutas **absolutas**
   (`/home/fede/pacman/ESP8266/...`). Hay que ajustarlas para otra máquina;
   idealmente convertirlas en rutas relativas al repo.
 - Los zips originales (`PSU PC para mis arcades.zip`, antes `ESP8266.zip` y
@@ -173,7 +187,7 @@ v2/com_test/              herramientas de diagnóstico de la capa física
   documentación: `comunicacion/` (GPIO con farewell, D5/D7 invertidos) y
   `ESP32/` (adaptación por pines a ESP32).
 - Los `CFG_*`, el bypass y el timeout de 60 s están documentados en
-  `v4/PROTOCOLO.md`, `v1.1/PROTOCOLO.md` y `v4.1/PROTOCOLO.md`; si se
+  `v1.4/PROTOCOLO.md`, `v1.1.1-beta/PROTOCOLO.md` y `v1.5-beta/PROTOCOLO.md`; si se
   cambian, actualizar el archivo correspondiente en el mismo commit.
 - El Teensy 3.0 tiene EEPROM emulada de 2048 B (`E2END=0x7FF`) y no
   necesita `EEPROM.begin()`/`commit()`, a diferencia del core ESP8266.
@@ -186,12 +200,12 @@ v2/com_test/              herramientas de diagnóstico de la capa física
   Batocera.
 - **Link de pines**: UART por SoftwareSerial en D5/D7 (ESP8266), UART1
   con pines remapeados (ESP32) o `Serial1` en pines 0/1 (Teensy 3.0).
-  v4.1 elige el perfil en `boards.h`. **Backend USB**: UART0/USB (`Serial`).
+  v1.5-beta elige el perfil en `boards.h`. **Backend USB**: UART0/USB (`Serial`).
 - **ALIVE / heartbeat**: mensaje periódico de la Pi para decir "sigo viva".
 - **QUIET**: ventana anunciada por la Pi durante la cual se suspende el
   watchdog (reinicios).
 - **BYE**: despedida ordenada antes del shutdown.
-- **Bypass**: modo temporal (botón FLASH en v4, pin 6 en v1.1,
-  `BYPASS_PIN` en v4.1) para
+- **Bypass**: modo temporal (botón FLASH en v1.4, pin 6 en v1.1.1-beta,
+  `BYPASS_PIN` en v1.5-beta) para
   configurar sin que la PSU se apague; nunca se persiste en EEPROM.
 - **FQBN**: identificador de placa de `arduino-cli`.
