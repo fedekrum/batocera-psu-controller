@@ -78,12 +78,14 @@ familias.
 - `system/pi.py`: daemon serial de la Pi (en la SD: `SHARE/system/pi.py`).
 - `v2-deprecated/esp8266.ino`: firmware v2 original, sin modificaciones.
   Se conserva solo como referencia histórica; no se debe flashear.
+- `v2-deprecated/pi.py`: daemon v2 original (copia de rescate de la SD),
+  sin los avisos de bypass de la v3. Solo referencia histórica.
 
 ## Historial
 
 - **v1**: versión inicial, muy básica: dos pines que transmitían
   heartbeats, sin comunicación serial.
-- **v2** (`v2-deprecated/esp8266.ino`): firmware original con serial,
+- **v2** (`v2-deprecated/`): firmware y `pi.py` originales con serial,
   tiempos hardcodeados y watchdog. **Deprecated**, reemplazado por v3.
 - **v3** (esta versión): configuración por comandos `CFG_*`, persistencia
   en EEPROM, modo bypass por FLASH, avisos a la Pi, indicador de fallo en
