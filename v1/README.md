@@ -1,4 +1,7 @@
-# Versión 1 — Teensy 3.0 (deprecated)
+# Versión 1 — Teensy 3.0 (en servicio)
+
+**Esta versión NO está deprecated**: sigue instalada y funcionando en un
+arcade con un Teensy 3.0. Se conserva tal cual para ese equipo.
 
 Primera versión del controlador: **dos pines, sin comunicación serial**.
 
@@ -11,5 +14,6 @@ Primera versión del controlador: **dos pines, sin comunicación serial**.
   - `GPIO_SHUTDOWN = 17`: entrada, recibe el pedido de apagado.
 - `diagrama_teensy_rpi_psu.txt`: cableado Teensy / Pi / PSU.
 
-No usar en producción: fue reemplazada por la v2 (ESP8266 por pines) y
-después por las versiones con serial. La versión actual es la v4.
+No es la línea de desarrollo actual (esa es la v4), pero no se considera
+obsoleta: está en producción en el arcade con Teensy 3.0 y se mantiene
+sin cambios por compatibilidad con ese hardware.

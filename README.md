@@ -3,9 +3,10 @@
 Control de fuente ATX y apagado ordenado de una Raspberry Pi con Batocera
 mediante un ESP8266 (también compila en ESP32 / S2 / S3).
 
-El repo está separado por versiones: `v1/` (Teensy), `v2/` (prototipo
-ESP8266 por pines), `v3/` (firmware serial) y `v4/` (versión actual,
-documentada abajo).
+El repo está separado por versiones: `v1/` (Teensy, **en servicio en un
+arcade**), `v2/` (prototipo ESP8266 por pines, deprecated), `v3/` (firmware
+serial, deprecated) y `v4/` (versión actual de desarrollo, documentada
+abajo).
 
 ## Versión 4
 
@@ -133,7 +134,10 @@ familias.
 
 ## Archivos
 
-### `v1/`
+### `v1/` (en servicio, no deprecated)
+
+Sigue instalada en un arcade con Teensy 3.0. Se conserva sin cambios por
+compatibilidad con ese equipo.
 
 - `teensy_power.ino`: controlador Teensy 3.0, dos pines (heartbeat y
   shutdown), sin serial.
@@ -173,7 +177,9 @@ serial:
 
 ## Historial
 
-- **v1**: Teensy 3.0, dos pines con heartbeats, sin serial.
+- **v1**: Teensy 3.0, dos pines con heartbeats, sin serial. **En servicio**
+  en un arcade; no está deprecated. La v4 es la línea de desarrollo actual,
+  pero esta versión se mantiene para ese hardware.
 - **v2**: prototipo ESP8266 con la misma lógica por pines (D5/D7), sin
   serial. **Deprecated**.
 - **v3**: firmware ESP8266 con serial (tiempos hardcodeados y watchdog) y
