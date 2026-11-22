@@ -14,5 +14,9 @@ v4** (copiado en cada carpeta). La ESP y la fuente se cablean igual; en el
 lado de la Pi las líneas D5/D7 son UART3 (`BCM4`/`BCM5`) en lugar de los
 pines de heartbeat/shutdown de v2.
 
+Incluye además `PROTOCOLO.md`, adaptado del documento del zip
+`comunicacion serial/PROTOCOLO.md` (que lo rotula "v2") a las constantes
+reales de este firmware.
+
 Esta es la versión que se usó como base para generar la v4 con
 `../v4/tools/make_cfg_firmware.py`. La versión actual es la v4.

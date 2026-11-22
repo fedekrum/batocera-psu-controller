@@ -43,9 +43,17 @@ cambia es el significado de esas dos líneas en el lado de la Pi: en v2 son
 `GPIO14`/`GPIO4` (heartbeat y shutdown), mientras que en v3 y v4 son UART3
 (`BCM4`/`BCM5`, pines 7 y 29).
 
-## Protocolo serial
+## Protocolo
 
-9600 8N1, línea por mensaje terminada en `\n`.
+Cada versión tiene su propio `PROTOCOLO.md`, porque la lógica cambia:
+`v1/PROTOCOLO.md` (Teensy, 2 GPIO), `v2/PROTOCOLO.md` (ESP8266 por
+pines), `v3/PROTOCOLO.md` (UART) y `v4/PROTOCOLO.md` (UART configurable,
+EEPROM y bypass). Los dos últimos se tomaron como referencia de los
+`PROTOCOLO.md` del zip `PSU PC para mis arcades.zip`, adaptados al código
+real de cada versión.
+
+Resumen del enlace serial (v3/v4): 9600 8N1, línea por mensaje terminada
+en `\n`.
 
 Pi -> ESP: `BOOT_OK`, `ALIVE seq=N uptime=N`, `BYE reason=...`, `PONG`,
 `LOG_LEVEL <nivel>`, `QUIET seconds=N`, `CFG_*`.
@@ -151,6 +159,8 @@ compatibilidad con ese equipo.
   shutdown), sin serial.
 - `RPi-power.py`: daemon con `lgpio`, GPIO18 heartbeat / GPIO17 shutdown.
 - `diagrama_teensy_rpi_psu.txt`: cableado.
+- `PROTOCOLO.md`: contrato de las dos líneas GPIO (heartbeat GPIO18 /
+  shutdown GPIO17) y del botón.
 
 ### `v2/` (deprecated)
 
@@ -163,6 +173,8 @@ serial:
 - `diagrama_esp_rpi_psu.txt`: diagrama de la fuente, ESP, botón, LED y
   líneas D5/D7. El mismo archivo está copiado en v3 y v4.
 - `test_psu/`, `com_test/` y `com_test/herramientas_diagnostico/`.
+- `PROTOCOLO.md`: contrato de heartbeat (GPIO14 → D7) y shutdown
+  (D5 → GPIO4).
 
 ### `v3/` (deprecated)
 
@@ -170,6 +182,7 @@ serial:
   watchdog. No flashear.
 - `pi.py`: daemon serial original (copia de rescate de la SD).
 - `README.md`: detalle de la versión.
+- `PROTOCOLO.md`: contrato UART (mensajes, timeouts y códigos de LED).
 - `diagrama_esp_rpi_psu.txt`: copia del diagrama compartido con v2 y v4.
 
 ### `v4/` (actual)
@@ -185,6 +198,7 @@ serial:
 - `v4/system/custom_service`: launcher Batocera (en la SD:
   `SHARE/system/services/custom_service`).
 - `diagrama_esp_rpi_psu.txt`: copia del diagrama compartido con v2 y v3.
+- `PROTOCOLO.md`: contrato UART v4 (CFG, EEPROM, bypass y timeout 60 s).
 
 ## Historial
 

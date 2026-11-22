@@ -13,6 +13,7 @@ Primera versión del controlador: **dos pines, sin comunicación serial**.
   - `GPIO_HEARTBEAT = 18`: salida, avisa "estoy vivo" al Teensy.
   - `GPIO_SHUTDOWN = 17`: entrada, recibe el pedido de apagado.
 - `diagrama_teensy_rpi_psu.txt`: cableado Teensy / Pi / PSU.
+- `PROTOCOLO.md`: contrato de señales, tiempos y obligaciones de cada lado.
 
 No es la línea de desarrollo actual (esa es la v4), pero no se considera
 obsoleta: está en producción en el arcade con Teensy 3.0 y se mantiene

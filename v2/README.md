@@ -15,6 +15,9 @@ la v1 (todavía sin comunicación serial):
   v4**: está copiado tal cual en las tres carpetas. En v3/v4 las dos líneas
   hacia la Pi pasan a ser UART3 en `BCM4`/`BCM5` en vez de heartbeat/shutdown
   por `GPIO14`/`GPIO4`.
+- `PROTOCOLO.md`: contrato de esta versión (D7 = alive, D5 = shutdown).
+  El documento del zip usado como plantilla describe una variante posterior
+  con los roles invertidos; no aplicar sus valores acá.
 - `test_psu/`: prueba aislada de la PSU.
 - `com_test/` y `com_test/herramientas_diagnostico/`: emisores/receptores
   A1/A2 y B1/B2, pruebas seriales C1/C2/C3 y su README.
