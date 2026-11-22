@@ -36,11 +36,12 @@ ESP8266 NodeMCU LoLin v3:
 Para ESP32 / S2 / S3 los pines por defecto son 5 / 4 / 2 / 14 / 13.
 
 **Diagrama compartido:** el cableado de la fuente, el botón, el LED y las
-dos líneas D5/D7 entre la ESP y la Pi es el mismo en **v2, v3 y v4**. El
-diagrama canónico está en `v2/diagrama_esp_rpi_psu.txt` (no se duplica en
-las otras carpetas). Lo único que cambia es el significado de esas dos
-líneas en el lado de la Pi: en v2 son `GPIO14`/`GPIO4` (heartbeat y
-shutdown), mientras que en v3 y v4 son UART3 (`BCM4`/`BCM5`, pines 7 y 29).
+dos líneas D5/D7 entre la ESP y la Pi es el mismo en **v2, v3 y v4**. Cada
+una de esas carpetas incluye su copia de `diagrama_esp_rpi_psu.txt` para
+que sea autocontenida (v1 tiene su propio diagrama Teensy). Lo único que
+cambia es el significado de esas dos líneas en el lado de la Pi: en v2 son
+`GPIO14`/`GPIO4` (heartbeat y shutdown), mientras que en v3 y v4 son UART3
+(`BCM4`/`BCM5`, pines 7 y 29).
 
 ## Protocolo serial
 
@@ -159,8 +160,8 @@ serial:
 - `power_on.ino`: prueba mínima de encendido.
 - `esp_power.ino`, `esp_power2.ino`: versiones de la lógica Teensy en ESP.
 - `RPi-power.py`: `lgpio`, GPIO14 heartbeat / GPIO4 shutdown.
-- `diagrama_esp_rpi_psu.txt`: **diagrama compartido con v3 y v4** (fuente,
-  ESP, botón, LED y líneas D5/D7).
+- `diagrama_esp_rpi_psu.txt`: diagrama de la fuente, ESP, botón, LED y
+  líneas D5/D7. El mismo archivo está copiado en v3 y v4.
 - `test_psu/`, `com_test/` y `com_test/herramientas_diagnostico/`.
 
 ### `v3/` (deprecated)
@@ -169,7 +170,7 @@ serial:
   watchdog. No flashear.
 - `pi.py`: daemon serial original (copia de rescate de la SD).
 - `README.md`: detalle de la versión.
-- Usa el mismo diagrama que v2 y v4: `../v2/diagrama_esp_rpi_psu.txt`.
+- `diagrama_esp_rpi_psu.txt`: copia del diagrama compartido con v2 y v4.
 
 ### `v4/` (actual)
 
@@ -183,7 +184,7 @@ serial:
   `SHARE/system/pi.py`).
 - `v4/system/custom_service`: launcher Batocera (en la SD:
   `SHARE/system/services/custom_service`).
-- Cableado: mismo diagrama que v2 y v3, en `../v2/diagrama_esp_rpi_psu.txt`.
+- `diagrama_esp_rpi_psu.txt`: copia del diagrama compartido con v2 y v3.
 
 ## Historial
 

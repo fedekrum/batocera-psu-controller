@@ -11,8 +11,8 @@ la v1 (todavía sin comunicación serial):
   - `GPIO_HEARTBEAT = 14`: salida de heartbeat.
   - `GPIO_SHUTDOWN = 4`: entrada de pedido de apagado.
 - Pines ESP: D1 botón, D2 PSU, D4 LED, D5 shutdown a la Pi, D7 alive de la Pi.
-- `diagrama_esp_rpi_psu.txt`: cableado. **Es el diagrama compartido por v2,
-  v3 y v4** (no hay copias en las otras carpetas). En v3/v4 las dos líneas
+- `diagrama_esp_rpi_psu.txt`: cableado. **Diagrama compartido por v2, v3 y
+  v4**: está copiado tal cual en las tres carpetas. En v3/v4 las dos líneas
   hacia la Pi pasan a ser UART3 en `BCM4`/`BCM5` en vez de heartbeat/shutdown
   por `GPIO14`/`GPIO4`.
 - `test_psu/`: prueba aislada de la PSU.
