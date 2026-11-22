@@ -8,6 +8,16 @@ arcade**), `v2/` (prototipo ESP8266 por pines, deprecated), `v3/` (firmware
 serial, deprecated) y `v4/` (versión actual de desarrollo, documentada
 abajo).
 
+## Índice rápido
+
+| Querés saber... | Archivo |
+|---|---|
+| Contexto general, reglas y estado del proyecto (empieza acá si sos una IA/agente) | `AGENTS.md` |
+| Por qué se tomaron las decisiones sensibles (60 s, numeración, bypass) | `DECISIONES.md` |
+| Cableado, mensajes y timeouts de una versión | `v1/`, `v2/`, `v3/` o `v4/` → `PROTOCOLO.md` |
+| Instalación en Batocera y comandos de build/flash | este README, abajo |
+| Histórico y estado de cada versión | este README, "Historial" |
+
 ## Versión 4
 
 - `ALIVE_TIMEOUT_MS = 60000`, grabado en EEPROM (persistente).
