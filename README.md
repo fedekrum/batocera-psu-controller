@@ -1,12 +1,13 @@
-# Controlador de PSU v4
+# Controlador de PSU
 
 Control de fuente ATX y apagado ordenado de una Raspberry Pi con Batocera
-mediante un ESP8266 (también compila en ESP32 / S2 / S3).
+mediante un ESP8266 (también compila en ESP32 / S2 / S3) o un Teensy 3.0.
 
 El repo está separado por versiones: `v1/` (Teensy, **en servicio en un
-arcade**), `v2/` (prototipo ESP8266 por pines, deprecated), `v3/` (firmware
-serial, deprecated) y `v4/` (versión actual de desarrollo, documentada
-abajo).
+arcade**), `v1.1/` (v4 portada a Teensy 3.0, **compilada pero sin probar en
+hardware**), `v2/` (prototipo ESP8266 por pines, deprecated), `v3/`
+(firmware serial, deprecated) y `v4/` (versión actual sobre ESP,
+documentada abajo).
 
 ## Índice rápido
 
@@ -14,7 +15,7 @@ abajo).
 |---|---|
 | Contexto general, reglas y estado del proyecto (empieza acá si sos una IA/agente) | `AGENTS.md` |
 | Por qué se tomaron las decisiones sensibles (60 s, numeración, bypass) | `DECISIONES.md` |
-| Cableado, mensajes y timeouts de una versión | `v1/`, `v2/`, `v3/` o `v4/` → `PROTOCOLO.md` |
+| Cableado, mensajes y timeouts de una versión | `v1/`, `v1.1/`, `v2/`, `v3/` o `v4/` → `PROTOCOLO.md` |
 | Instalación en Batocera y comandos de build/flash | este README, abajo |
 | Histórico y estado de cada versión | este README, "Historial" |
 
@@ -32,6 +33,20 @@ abajo).
 
 `CFG_VERSION = 4` es la versión del esquema de configuración guardado en
 EEPROM; no confundir con la versión del controlador (v4).
+
+## Versión 1.1 (Teensy 3.0)
+
+La misma lógica y el mismo protocolo de v4, pero en Teensy 3.0. No
+reemplaza a `v1/`, que sigue en servicio en el arcade original.
+
+- Serial1 por hardware en pines **0 (RX) y 1 (TX)**; la Pi usa UART3
+  (BCM4/BCM5, pines 7 y 29), igual que v4.
+- Bypass por pin dedicado **6** (no hay botón FLASH).
+- LED en pin 13, activo HIGH; EEPROM emulada por Teensyduino.
+- `ALIVE_TIMEOUT_MS = 60000` **de fábrica** (no depende de un grabado
+  manual como en v4).
+- Compila con `teensy:avr:teensy30`. Ver `v1.1/README.md` y
+  `v1.1/PROTOCOLO.md`. **No probada en hardware.**
 
 ## Hardware
 
@@ -56,14 +71,14 @@ cambia es el significado de esas dos líneas en el lado de la Pi: en v2 son
 ## Protocolo
 
 Cada versión tiene su propio `PROTOCOLO.md`, porque la lógica cambia:
-`v1/PROTOCOLO.md` (Teensy, 2 GPIO), `v2/PROTOCOLO.md` (ESP8266 por
-pines), `v3/PROTOCOLO.md` (UART) y `v4/PROTOCOLO.md` (UART configurable,
-EEPROM y bypass). Los dos últimos se tomaron como referencia de los
-`PROTOCOLO.md` del zip `PSU PC para mis arcades.zip`, adaptados al código
-real de cada versión.
+`v1/PROTOCOLO.md` (Teensy, 2 GPIO), `v1.1/PROTOCOLO.md` (Teensy, UART),
+`v2/PROTOCOLO.md` (ESP8266 por pines), `v3/PROTOCOLO.md` (UART) y
+`v4/PROTOCOLO.md` (UART configurable, EEPROM y bypass). Los dos últimos se
+tomaron como referencia de los `PROTOCOLO.md` del zip `PSU PC para mis
+arcades.zip`, adaptados al código real de cada versión; v1.1 deriva de v4.
 
-Resumen del enlace serial (v3/v4): 9600 8N1, línea por mensaje terminada
-en `\n`.
+Resumen del enlace serial (v1.1/v3/v4): 9600 8N1, línea por mensaje
+terminada en `\n`.
 
 Pi -> ESP: `BOOT_OK`, `ALIVE seq=N uptime=N`, `BYE reason=...`, `PONG`,
 `LOG_LEVEL <nivel>`, `QUIET seconds=N`, `CFG_*`.
@@ -155,8 +170,16 @@ arduino-cli upload -p /dev/ttyUSB0 \
   v4/esp8266_cfg
 ```
 
+Para el Teensy 3.0 (v1.1):
+
+```sh
+arduino-cli compile --fqbn teensy:avr:teensy30 \
+  --build-path /tmp/opencode/build-teensy30 v1.1/teensy_cfg
+```
+
 Usar siempre `--build-path` explícito para evitar colisiones de caché entre
-familias.
+familias. No se hace `upload`: hace falta el cargador HalfKay y una placa,
+y no hay ninguna conectada.
 
 ## Archivos
 
@@ -171,6 +194,17 @@ compatibilidad con ese equipo.
 - `diagrama_teensy_rpi_psu.txt`: cableado.
 - `PROTOCOLO.md`: contrato de las dos líneas GPIO (heartbeat GPIO18 /
   shutdown GPIO17) y del botón.
+
+### `v1.1/` (compilada, sin probar en hardware)
+
+Puerto de v4 a Teensy 3.0:
+
+- `teensy_cfg/teensy_cfg.ino`: firmware (escrito a mano, no generado).
+- `teensy_cfg/cfg_types.h`: estructura de configuración y defaults.
+- `system/pi.py`: mismo daemon que v4, con textos adaptados.
+- `system/custom_service`: launcher Batocera.
+- `diagrama_teensy_v1_psu.txt`: cableado y cambios frente a v1.
+- `PROTOCOLO.md`: contrato UART del Teensy.
 
 ### `v2/` (deprecated)
 
@@ -215,6 +249,9 @@ serial:
 - **v1**: Teensy 3.0, dos pines con heartbeats, sin serial. **En servicio**
   en un arcade; no está deprecated. La v4 es la línea de desarrollo actual,
   pero esta versión se mantiene para ese hardware.
+- **v1.1**: v4 portada a Teensy 3.0: Serial1 en pines 0/1, bypass por pin
+  6, EEPROM emulada y timeout de 60 s de fábrica. **Compilada** con
+  Teensyduino 1.62.0, **sin probar en hardware**. No reemplaza a v1.
 - **v2**: prototipo ESP8266 con la misma lógica por pines (D5/D7), sin
   serial. **Deprecated**.
 - **v3**: firmware ESP8266 con serial (tiempos hardcodeados y watchdog) y

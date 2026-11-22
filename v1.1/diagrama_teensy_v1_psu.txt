@@ -1,0 +1,88 @@
+Descripción:
+============
+
+v1.1 es la misma lógica que v4 pero corriendo en un Teensy 3.0. El
+Teensy queda alimentado desde el +5V standby (violeta) de la ATX y
+vive con la fuente principal apagada.
+
+Respecto de v1 cambia la forma de hablar con la Raspberry Pi: se
+abandonan las dos líneas GPIO (GPIO18 heartbeat / GPIO17 shutdown) y
+se usa Serial1, un UART por hardware en los pines 0 (RX) y 1 (TX).
+La Pi ofrece UART3 en BCM4 (TX, pin 7) y BCM5 (RX, pin 29).
+
+El pin 6 se usa para el bypass (entrada con pull-up, activo LOW),
+porque el Teensy 3.0 no tiene el botón FLASH de la NodeMCU.
+
+IMPORTANTE: el Teensy 3.0 NO tolera 5V. Todas las señales son 3,3V.
+
+
+Diagrama:
+=========
+
+                    PC ATX PSU          Teensy 3.0           Raspberry Pi 5
+                    ┌──────────┐        ┌──────────┐         ┌──────────┐
+   +5VSB (violeta) ─┤ VIN      ├────────┤ VIN      │         │          │
+                    │          │        │          │         │          │
+   GND (negro)     ─┤ GND      ├────────┤ GND      ├─────────┤ GND (6)  │
+                    │          │        │          │         │          │
+   PS_ON (verde)  ──┤          │   ┌────┤ D2       │         │          │
+        ▲           └──────────┘   │    │          │         │          │
+        │                   [1k] ──┘    │          │         │          │
+      D882-Y                          │ │ D3       │         │          │
+      E-C-B                          └─┤ (botón)  │         │          │
+        │                              │          │         │          │
+        └─── colector a PS_ON           │ D13 LED  │         │          │
+                                        │          │         │          │
+                                        │ D0 RX  ◄─┼─────────┤ BCM4 TX  │
+                                        │   (S1)   │   pin 7 │          │
+                                        │ D1 TX  ──┼─────────► BCM5 RX  │
+                                        │   (S1)   │  pin 29 │          │
+                                        │          │         │          │
+                                        │ D6      │         │          │
+                                        │ (bypass)│         │          │
+                                        └──────────┘         └──────────┘
+
+Leyenda de pines Teensy 3.0:
+  D0  = Serial1 RX  (del Pin 7 / BCM4 de la Pi)
+  D1  = Serial1 TX  (al Pin 29 / BCM5 de la Pi)
+  D2  = PS_ON vía transistor D882-Y (1k en base)
+  D3  = botón/llave con INPUT_PULLUP
+  D6  = bypass con INPUT_PULLUP (activo LOW)
+  D13 = LED interno, activo HIGH
+  VIN = +5VSB, GND común con la ATX y la Pi
+
+
+Cambios de cableado respecto de v1:
+===================================
+
+  v1: Teensy D4 ──► Pi GPIO17 (pedido de apagado)
+      Teensy D5 ◄── Pi GPIO18 (heartbeat)
+
+  v1.1: esas dos líneas se retiran. En su lugar:
+      Teensy D0 ◄── Pi pin 7  (BCM4, UART3 TX)
+      Teensy D1 ──► Pi pin 29 (BCM5, UART3 RX)
+
+  D2, D3, D13 y la alimentación no cambian.
+
+
+Software:
+=========
+
+  Sketch (Arduino / Teensyduino):
+    teensy_cfg/teensy_cfg.ino  +  teensy_cfg/cfg_types.h
+
+  Daemon en la Pi:
+    system/pi.py  →  /userdata/system/pi.py
+    system/custom_service  →  /userdata/system/services/custom_service
+
+  Contrato completo: PROTOCOLO.md
+
+
+Build / flash:
+==============
+
+  arduino-cli compile --fqbn teensy:avr:teensy30 \
+    --build-path /tmp/opencode/build-teensy30 v1.1/teensy_cfg
+
+  Para cargar se necesita el botón PROGRAM del Teensy y el cargador
+  HalfKay (teensy-loader-cli), que no está instalado en esta máquina.

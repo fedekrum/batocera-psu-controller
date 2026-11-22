@@ -60,6 +60,29 @@ como están.
   enlace conmute a USB e ignora `POWEROFF_REQ` mientras tanto. Los
   `CFG_SET` de backend/pines/baud se rechazan con `CFG_ERR bypass active`.
 
+## 2026-11-22 — v1.1: v4 en Teensy 3.0
+
+- **Decisión**: crear `v1.1/` con la lógica de v4 portada a Teensy 3.0,
+  sin tocar `v1/` (sigue en servicio en el arcade original).
+- **Por qué**: el usuario quiere el mismo protocolo y el mismo margen de
+  apagado en hardware Teensy, manteniendo la línea v1 intacta.
+- **Serial**: se usa `Serial1`, UART por hardware en pines **0 (RX) y
+  1 (TX)**. Estaban libres en v1 (que usaba 2, 3, 4, 5 y 13), no requieren
+  mover el botón ni el transistor y no dependen de SoftwareSerial. En la
+  Pi se mantienen los pines de v4: BCM4 TX (pin 7) y BCM5 RX (pin 29).
+  Alternativas descartadas: `Serial3` (pines 7/8) y `Serial2` (9/10),
+  que ocupan pines útiles y no aportan ventaja.
+- **Bypass**: pin **6** con `INPUT_PULLUP`, activo LOW, porque el Teensy
+  3.0 no tiene botón FLASH. Es configurable con `BYPASS_PIN`.
+- **Timeout**: el default compilado es 60000 ms (en v4 era 30000 y se
+  dependía de un valor grabado a mano). Así no hay riesgo de volver a
+  corromper la SD si se graba un `CFG_RESET`.
+- **EEPROM**: emulada por Teensyduino (`E2END=0x7FF`, 2048 B), sin
+  `begin()`/`commit()`. El `CFG_MAGIC` cambia (`0x54454331`) para que una
+  configuración de v4 no se interprete como válida en otra placa.
+- **Estado**: compila con `teensy:avr:teensy30`. No se flasheó ni se
+  probó en hardware; `teensy-loader-cli` no está instalado.
+
 ## 2026-11-22 — EEPROM con CRC y guardado explícito
 
 - **Decisión**: los cambios de `CFG_SET` viven en RAM hasta `CFG_SAVE`.
