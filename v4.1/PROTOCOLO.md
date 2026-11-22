@@ -19,6 +19,14 @@ documento o actualizarlo en el mismo commit.
 | ESP32-S3 | UART1, RX GPIO14 / TX GPIO13 | GPIO0 | GPIO2, activo LOW | flash emulada | `0x56343132` |
 | Teensy 3.0 | `Serial1`, pin 0 RX / pin 1 TX (**fijos**) | pin 6 | pin 13, activo HIGH | emulada por Teensyduino, 2048 B, sin `begin()`/`commit()` | `0x56343154` |
 
+- El default de fábrica es **llave/switch (`BUTTON_TYPE=1`) en todas las
+  placas**, igual que v4. Cualquier placa puede operar con pulsador
+  momentáneo ("temp switch") con `CFG_SET BUTTON_TYPE=0` + `CFG_SAVE` +
+  reboot. No hay defaults de botón por placa.
+- Al elegir momentáneo, los tiempos ya valen los de v1: 500 ms para
+  encender/apagar suave, 6000 ms para corte forzado, 10 s de supresión
+  tras encender, 5 s de settle al cortar y 20 ms de debounce. Son los
+  mismos valores que v4.1 trae de fábrica en esas claves `CFG_*`.
 - `CFG_VERSION = 5` es la versión del **esquema EEPROM**, no del
   controlador. Cambió respecto de v4 (4) porque se agregó el campo
   `bypassPin`. El magic distinto por familia evita interpretar una
@@ -123,7 +131,7 @@ ESP8266, 48 en ESP32, 33 en Teensy).
 | `DEBOUNCE_STABLE_MS` | 20 | Debounce del botón. |
 | `LINK_BAUD` | 9600 | 1200–115200. `reboot=1`. |
 | `LINK_BACKEND` | 0 | 0 = pines, 1 = USB. `reboot=1`. |
-| `BUTTON_TYPE` | 1 | 0 = momentáneo, 1 = llave. |
+| `BUTTON_TYPE` | 1 | 0 = momentáneo ("temp switch", tiempos de v1), 1 = llave/switch (default v4, válido en todas las placas). `reboot=1`. |
 | `BUTTON_PIN` | 5 ESP / 3 Teensy | `reboot=1`. |
 | `PSU_ON_PIN` | 4 ESP / 2 Teensy | `reboot=1`. |
 | `PIN_SERIAL_RX` | 14 ESP / 0 Teensy | Fijo en Teensy (`CFG_ERR fixed pin`). |
@@ -132,6 +140,24 @@ ESP8266, 48 en ESP32, 33 en Teensy).
 | `BYPASS_PIN` | 0 ESP / 6 Teensy | `reboot=1`. |
 | `PSU_ON_ACTIVE_HIGH` | 1 | PS_ON activo HIGH. |
 | `LED_LOGICAL_ON_GPIO_HIGH` | 0 ESP / 1 Teensy | Polaridad del LED. |
+
+### Modo momentáneo: equivalencia con v1
+
+No hacen falta variables nuevas: los tiempos del pulsador de v1 ya están en
+la configuración y sus defaults son esos valores.
+
+| v1 (`teensy_power.ino`) | Clave v4.1 | Default |
+|---|---|---|
+| `HOLD_TO_ON_MS` | `MOMENTARY_SHORT_MS` | 500 |
+| `FORCED_OFF_MS` | `MOMENTARY_LONG_FORCE_MS` | 6000 |
+| `RPI_BOOT_GRACE_MS` | `MOMENTARY_SOFT_SUPPRESS_MS` | 10000 |
+| `POST_SHUTDOWN_DELAY_MS` | `PSU_OFF_SETTLE_DELAY_MS` | 5000 |
+| debounce de 20 ms | `DEBOUNCE_STABLE_MS` | 20 |
+
+`SHUTDOWN_PULSE_MS` (2000) y `CONFIRM_DEATH_MS` (3000) de v1 no tienen
+equivalente: fueron reemplazados por el `BYE` de la Pi y el watchdog de
+60 s. El pin del botón sigue siendo `BUTTON_PIN` (default 3 en Teensy,
+5 en ESP) y funciona igual en los dos modos.
 
 ## Flujo de apagado
 

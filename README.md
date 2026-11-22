@@ -59,6 +59,9 @@ modifica v4, v1.1 ni v1.
   polaridad del LED, EEPROM y tipo de enlace).
 - `ALIVE_TIMEOUT_MS = 60000` de fábrica en todas las placas.
 - Bypass configurable con `BYPASS_PIN` (GPIO0 en ESP, pin 6 en Teensy).
+- `BUTTON_TYPE` funciona en las cinco placas: llave (default v4) o
+  pulsador momentáneo ("temp switch"). Al elegir momentáneo, los tiempos
+  son los de v1 (500/6000/10000 ms); no hay defaults de botón por placa.
 - Esquema EEPROM 5: una configuración de v4 no se lee, pero los defaults
   ya traen 60 s.
 - Compilada para las cinco placas. **No probada en hardware.** Ver

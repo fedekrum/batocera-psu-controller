@@ -4,6 +4,24 @@ Registro corto de las decisiones que no son obvias mirando el código.
 Sirve para no repetir discusiones y para entender por qué algunas cosas están
 como están.
 
+## 2026-11-22 — Los dos tipos de botón en v4.1
+
+- **Decisión**: el default de `BUTTON_TYPE` sigue siendo `1` (llave/switch,
+  como v4) en **todas** las placas, incluida la Teensy. No se puso un default
+  de botón por placa en `boards.h`.
+- **Por qué**: v1 usa un pulsador momentáneo ("temp switch") en el arcade,
+  pero eso no debe cambiar el default global. Lo que se necesita es poder
+  operar **cualquier placa** con cualquiera de los dos tipos.
+- **Cómo se hace**: `CFG_SET BUTTON_TYPE=0` + `CFG_SAVE` + reboot habilita el
+  momentáneo. Los tiempos de v1 ya están en la configuración con esos
+  valores: `MOMENTARY_SHORT_MS=500`, `MOMENTARY_LONG_FORCE_MS=6000`,
+  `MOMENTARY_SOFT_SUPPRESS_MS=10000`, más `PSU_OFF_SETTLE_DELAY_MS=5000` y
+  `DEBOUNCE_STABLE_MS=20`. No hicieron falta variables nuevas.
+- `SHUTDOWN_PULSE_MS` y `CONFIRM_DEATH_MS` de v1 no se replican: el apagado
+  ordenado usa `BYE` y el watchdog de 60 s.
+- La equivalencia v1 → `CFG_*` quedó documentada en
+  `v4.1/PROTOCOLO.md` → "Modo momentáneo: equivalencia con v1".
+
 ## 2026-11-22 — Timeout de apagado: 60 s
 
 - **Decisión**: `ALIVE_TIMEOUT_MS = 60000`, grabado en la EEPROM de la ESP.

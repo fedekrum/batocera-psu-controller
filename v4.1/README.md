@@ -34,6 +34,23 @@ cuatro puntos condicionales:
 Todo lo demás —mensajes, watchdog de 60 s, `QUIET`, `BYE`, códigos de
 LED, bloqueo de `CFG_SET` en bypass— es una sola implementación.
 
+### Los dos tipos de botón
+
+`BUTTON_TYPE` funciona en **cualquier placa**: `1` = llave/switch (default
+de fábrica, igual que v4) y `0` = pulsador momentáneo ("temp switch", como
+el de v1). No hay defaults de botón por placa. Para usar momentáneo:
+
+```sh
+CFG_SET BUTTON_TYPE=0
+CFG_SAVE
+# reboot
+```
+
+Los tiempos del modo momentáneo ya vienen con los valores de v1
+(500 ms / 6000 ms / 10 s / 5 s / 20 ms de debounce), así que no hicieron
+falta variables nuevas. La equivalencia completa está en
+`PROTOCOLO.md` → "Modo momentáneo: equivalencia con v1".
+
 ## Cambios frente a v4 / v1.1
 
 | | v4 | v1.1 | v4.1 |
@@ -42,6 +59,7 @@ LED, bloqueo de `CFG_SET` en bypass— es una sola implementación.
 | `ALIVE_TIMEOUT_MS` default | 30000 (EEPROM grabada a 60000) | 60000 | **60000 en todas** |
 | Esquema EEPROM | 4 | 4 | **5** (agrega `bypassPin`) |
 | Bypass | GPIO0 fijo | pin 6 fijo | configurable (`BYPASS_PIN`) |
+| Botón | llave default, momentáneo opcional | llave default | igual que v4, en **todas** las placas |
 | Fuentes de firmware | generador + archivo generado | archivo a mano | **un archivo** |
 | `pi.py` | copia en v4 | copia en v1.1 | **una copia** |
 
@@ -101,5 +119,7 @@ ambos ejecutables. Habilitar `enable_uart=1`, `dtoverlay=miniuart-bt` y
 1. Ver `HELLO fw=v41-<placa>` en el monitor serie.
 2. Confirmar `CFG_GET ALIVE_TIMEOUT_MS` devuelve 60000.
 3. Ciclo llave ON → `BOOT_OK`/`ALIVE` → llave OFF → `BYE` → corte a los 60 s.
-4. En Teensy, probar el pin 6: `MODE BYPASS` / `MODE NORMAL` y LED con fade.
-5. Varios ciclos y revisar que la SD no se corrompe.
+4. Probar `CFG_SET BUTTON_TYPE=0` + reboot: pulsación de 500 ms enciende/
+   apaga suave y de 6000 ms corta la PSU, en Teensy y en ESP.
+5. En Teensy, probar el pin 6: `MODE BYPASS` / `MODE NORMAL` y LED con fade.
+6. Varios ciclos y revisar que la SD no se corrompe.

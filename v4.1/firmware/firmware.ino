@@ -85,6 +85,9 @@ static void cfgLoadDefaults()
   cfg.debounceStableMs = 20;
 
   cfg.linkBaud = 9600;
+  // Default de fabrica = llave/switch (v4) en TODAS las placas.
+  // CFG_SET BUTTON_TYPE=0 habilita el pulsador momentaneo ("temp switch")
+  // en cualquier placa; sus tiempos (abajo) ya son los de v1.
   cfg.buttonType = SWITCH;
   cfg.buttonPin = CFG_DEF_BUTTON_PIN;
   cfg.psuOnPin = CFG_DEF_PSU_PIN;

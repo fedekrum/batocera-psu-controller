@@ -26,6 +26,9 @@ Hay cuatro líneas de desarrollo:
   ESP.
 - **v4.1**: un solo firmware para las cinco placas. Compila en todas,
   **sin probar en hardware**. Es la línea a mantener de acá en adelante.
+  Default de botón = llave (v4) en todas; `BUTTON_TYPE=0` habilita el
+  pulsador momentáneo de v1 en cualquier placa, con sus tiempos ya
+  configurados (`MOMENTARY_*`).
 
 v2 y v3 son históricas/deprecated, pero se conservan porque explican la
 evolución y porque v3 es la fuente del generador de v4.
