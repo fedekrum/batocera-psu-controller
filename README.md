@@ -53,6 +53,64 @@ Comandos por serial: `CFG`, `CFG_GET <key>`, `CFG_SET <key>=<value>`,
 requieren reinicio. Los valores se guardan en la EEPROM interna de la
 ESP (`CFG_VERSION = 4`).
 
+## Instalar `pi.py` en Batocera
+
+En Batocera la partición **SHARE** se monta en `/userdata`. Por eso el
+daemon va en `/userdata/system/pi.py` (en la PC, con la SD montada, es
+`SHARE/system/pi.py`).
+
+### Desde la PC con la SD montada
+
+```sh
+# ajustar el punto de montaje según tu usuario
+SHARE=/run/media/fede/SHARE
+cp v3/system/pi.py "$SHARE/system/pi.py"
+chmod +x "$SHARE/system/pi.py"
+grep 'VERSION 3' "$SHARE/system/pi.py"   # verificación
+```
+
+Después desmonta y expulsa la SD con `udisksctl` antes de llevársela a la Pi.
+
+### Desde SSH en la Pi
+
+```sh
+scp v3/system/pi.py root@<IP-de-la-Pi>:/userdata/system/pi.py
+ssh root@<IP-de-la-Pi> 'chmod +x /userdata/system/pi.py'
+ssh root@<IP-de-la-Pi> reboot
+```
+
+### Launcher (necesario para que arranque)
+
+`v3/system/custom_service` es el script que lanza el daemon:
+
+```
+/userdata/system/services/custom_service
+```
+
+Arranca `python3 -u /userdata/system/pi.py` con
+`PI_SERIAL_DEVICE` (por defecto `/dev/ttyAMA4`) y escribe el log en
+`/userdata/system/pi_power.log`. Copiarlo, darle `chmod +x` y reiniciar.
+Para reiniciar el daemon sin reboot:
+
+```sh
+/userdata/system/services/custom_service stop
+/userdata/system/services/custom_service start
+```
+
+El `stop` envía SIGTERM y espera a que `pi.py` loguee el apagado, escriba
+la traza en `pi_power.shutdown.log`, envíe `BYE` al ESP y drene la UART
+antes de que se desmonte la SD.
+
+### Verificación
+
+```sh
+tail -f /userdata/system/pi_power.log
+```
+
+Debe aparecer `Arrancando pi.py serial ...`, `TX BOOT_OK` y `TX ALIVE
+seq=...`. Si no aparece nada, revisar que `PI_SERIAL_DEVICE` sea el
+correcto y que el launcher esté ejecutable.
+
 ## Build y flash
 
 ```sh
@@ -93,6 +151,8 @@ familias.
   `SRC`/`DST` son absolutas; ajustarlas si se usa en otra máquina.
 - `v3/system/pi.py`: daemon serial de la Pi (en la SD:
   `SHARE/system/pi.py`).
+- `v3/system/custom_service`: launcher Batocera (en la SD:
+  `SHARE/system/services/custom_service`).
 
 ## Historial
 

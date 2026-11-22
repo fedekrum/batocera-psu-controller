@@ -1,0 +1,53 @@
+#!/bin/sh
+# Copiar a /userdata/system/custom.sh (Batocera), chmod +x, reiniciar.
+#
+# Arranca pi.py (serial heartbeat + shutdown ESP) y, si existe,
+# el monitor de volumen.
+
+LOG=/userdata/system/pi_power.log
+BIN=/userdata/system/pi.py
+# UART por defecto del proyecto: UART4 en GPIO12/13 (pins 32/33).
+# Se puede overridear desde entorno.
+SERIAL_DEVICE=${PI_SERIAL_DEVICE:-/dev/ttyAMA4}
+
+case "$1" in
+  start|"")
+    (
+      sleep 3
+      pkill -f "python3 $BIN" 2>/dev/null
+      pkill -f "python3 /userdata/system/RPi-power.py" 2>/dev/null
+      pkill -f "python3 /userdata/system/C2_RPi_Serial.py" 2>/dev/null
+      sleep 1
+      # -u: salida al log sin buffer (nivel de log: LOG_LEVEL_DEFAULT en pi.py).
+      PI_SERIAL_DEVICE="$SERIAL_DEVICE" setsid python3 -u "$BIN" >> "$LOG" 2>&1 < /dev/null &
+    ) &
+    # Monitor de volumen desactivado por ahora.
+    if [ -f /userdata/system/volume_switch_monitor.sh ]; then
+      nohup /userdata/system/volume_switch_monitor.sh > /dev/null 2>&1 &
+    fi
+    ;;
+  stop)
+    # SIGTERM al daemon y esperar hasta que termine (con tope). Asi
+    # pi.py tiene tiempo de:
+    #   1) loguear "shutdown detectado"
+    #   2) escribir la traza durable (fsync) en pi_power.shutdown.log
+    #   3) enviar QUIET (si es reboot) + BYE al ESP
+    #   4) drenar la UART
+    # antes de que init siga con swapoff/umount.
+    #
+    # OJO con el patron: arrancamos con 'python3 -u $BIN', por eso el
+    # regex 'python3.*$BIN'. Un patron literal 'python3 $BIN' NO matchea
+    # (el -u queda en el medio) y el SIGTERM nunca llegaba.
+    pkill -TERM -f "python3.*$BIN" 2>/dev/null
+    for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
+      pgrep -f "python3.*$BIN" >/dev/null 2>&1 || break
+      sleep 0.1
+    done
+    # Fallback duro si no salio limpio en 2s.
+    pkill -KILL -f "python3.*$BIN" 2>/dev/null
+    ;;
+  *)
+    echo "Uso: $0 {start|stop}"
+    exit 1
+    ;;
+esac
