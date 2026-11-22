@@ -3,6 +3,9 @@
 Control de fuente ATX y apagado ordenado de una Raspberry Pi con Batocera
 mediante un ESP8266 (también compila en ESP32 / S2 / S3).
 
+El repo está separado por versiones: `v1/` (sin código conservado),
+`v2/` (deprecated) y `v3/` (versión actual, documentada abajo).
+
 ## Versión 3
 
 - `ALIVE_TIMEOUT_MS = 60000`, grabado en EEPROM (persistente).
@@ -56,12 +59,12 @@ ESP (`CFG_VERSION = 4`).
 arduino-cli compile \
   --fqbn esp8266:esp8266:nodemcuv2 \
   --build-path /tmp/opencode/build-esp8266-esp8266-nodemcuv2 \
-  esp8266_cfg
+  v3/esp8266_cfg
 
 arduino-cli upload -p /dev/ttyUSB0 \
   --fqbn esp8266:esp8266:nodemcuv2 \
   --build-path /tmp/opencode/build-esp8266-esp8266-nodemcuv2 \
-  esp8266_cfg
+  v3/esp8266_cfg
 ```
 
 Usar siempre `--build-path` explícito para evitar colisiones de caché entre
@@ -69,24 +72,34 @@ familias.
 
 ## Archivos
 
-- `esp8266_cfg/esp8266_cfg.ino`: firmware generado.
-- `esp8266_cfg/cfg_types.h`: tipos, defines y plataformas.
-- `tools/make_cfg_firmware.py`: generador del firmware. Lee el firmware v2
-  (`/home/fede/pacman/ESP8266/esp8266.ino`, guardado acá en
-  `v2-deprecated/esp8266.ino`) y escribe `esp8266_cfg/esp8266_cfg.ino`.
-  Las rutas `SRC`/`DST` son absolutas; ajustarlas si se usa en otra máquina.
-- `system/pi.py`: daemon serial de la Pi (en la SD: `SHARE/system/pi.py`).
-- `v2-deprecated/esp8266.ino`: firmware v2 original, sin modificaciones.
-  Se conserva solo como referencia histórica; no se debe flashear.
-- `v2-deprecated/pi.py`: daemon v2 original (copia de rescate de la SD),
-  sin los avisos de bypass de la v3. Solo referencia histórica.
+### `v1/`
+
+- `README.md`: única referencia disponible; no se conservó código.
+
+### `v2/` (deprecated)
+
+- `esp8266.ino`: firmware v2 original, sin modificaciones. No flashear.
+- `pi.py`: daemon v2 original (copia de rescate de la SD), sin los avisos
+  de bypass de la v3. Solo referencia histórica.
+- `README.md`: detalle de la versión.
+
+### `v3/` (actual)
+
+- `v3/esp8266_cfg/esp8266_cfg.ino`: firmware generado.
+- `v3/esp8266_cfg/cfg_types.h`: tipos, defines y plataformas.
+- `v3/tools/make_cfg_firmware.py`: generador del firmware. Lee el firmware
+  v2 (`/home/fede/pacman/ESP8266/esp8266.ino`, guardado acá en
+  `v2/esp8266.ino`) y escribe `v3/esp8266_cfg/esp8266_cfg.ino`. Las rutas
+  `SRC`/`DST` son absolutas; ajustarlas si se usa en otra máquina.
+- `v3/system/pi.py`: daemon serial de la Pi (en la SD:
+  `SHARE/system/pi.py`).
 
 ## Historial
 
 - **v1**: versión inicial, muy básica: dos pines que transmitían
   heartbeats, sin comunicación serial.
-- **v2** (`v2-deprecated/`): firmware y `pi.py` originales con serial,
-  tiempos hardcodeados y watchdog. **Deprecated**, reemplazado por v3.
+- **v2** (`v2/`): firmware y `pi.py` originales con serial, tiempos
+  hardcodeados y watchdog. **Deprecated**, reemplazado por v3.
 - **v3** (esta versión): configuración por comandos `CFG_*`, persistencia
   en EEPROM, modo bypass por FLASH, avisos a la Pi, indicador de fallo en
   el LED y timeout de 60 s para asegurar apagados limpios de la SD.
