@@ -52,7 +52,7 @@ No existe `v5/`: «la 5» es `v1.5-beta/` (antes `v4.1/`).
 | Dir | Estado | Micro | Comunicación con la Pi | Archivo clave |
 |---|---|---|---|---|
 | `v1.1/` | **en servicio** | Teensy 3.0 | 2 GPIO: GPIO18 heartbeat, GPIO17 shutdown | `teensy_power.ino`, `RPi-power.py`, `PROTOCOLO.md` |
-| `v1.1.1-beta/` | compilada, sin probar | Teensy 3.0 | Serial1 pins 0/1 (UART3 en la Pi), bypass pin 6 | `teensy_cfg/`, `system/`, `PROTOCOLO.md` |
+| `v1.1.1-beta/` | compilada, sin probar | Teensy 3.0 | Serial1 pins 0/1 (UART4 en la Pi: pin 32/33 en Pi 5), bypass pin 6 | `teensy_cfg/`, `system/`, `PROTOCOLO.md` |
 | `v1.2/` | deprecated | ESP8266 | 2 GPIO: GPIO14 → D7 alive, D5 → GPIO4 shutdown | `esp_power.ino`, `esp_power2.ino`, `PROTOCOLO.md` |
 | `v1.3/` | deprecated, **fuente** | ESP8266 | UART 9600, `BOOT_OK`/`ALIVE`/`BYE` | `esp8266.ino`, `pi.py`, `PROTOCOLO.md` |
 | `v1.4/` | activa sobre ESP | ESP8266 / ESP32 / S2 / S3 | UART 9600 + `CFG_*` + bypass | `esp8266_cfg/`, `system/`, `PROTOCOLO.md` |

@@ -8,7 +8,9 @@ vive con la fuente principal apagada.
 Respecto de v1.1 cambia la forma de hablar con la Raspberry Pi: se
 abandonan las dos líneas GPIO (GPIO18 heartbeat / GPIO17 shutdown) y
 se usa Serial1, un UART por hardware en los pines 0 (RX) y 1 (TX).
-La Pi ofrece UART3 en BCM4 (TX, pin 7) y BCM5 (RX, pin 29).
+La Pi 5 ofrece UART4 en GPIO12 (TX, pin 32) y GPIO13 (RX, pin 33)
+con dtoverlay=uart4-pi5. En la Pi 4 el equivalente es uart4 en
+BCM8/BCM9 (pines 3/5). En ambos casos el dispositivo es /dev/ttyAMA4.
 
 El pin 6 se usa para el bypass (entrada con pull-up, activo LOW),
 porque el Teensy 3.0 no tiene el botón FLASH de la NodeMCU.
@@ -33,18 +35,18 @@ Diagrama:
         │                              │          │         │          │
         └─── colector a PS_ON           │ D13 LED  │         │          │
                                         │          │         │          │
-                                        │ D0 RX  ◄─┼─────────┤ BCM4 TX  │
-                                        │   (S1)   │   pin 7 │          │
-                                        │ D1 TX  ──┼─────────► BCM5 RX  │
-                                        │   (S1)   │  pin 29 │          │
+                                        │ D0 RX  ◄─┼─────────┤ GPIO12TX │
+                                        │   (S1)   │  pin 32 │          │
+                                        │ D1 TX  ──┼─────────► GPIO13RX │
+                                        │   (S1)   │  pin 33 │          │
                                         │          │         │          │
                                         │ D6      │         │          │
                                         │ (bypass)│         │          │
                                         └──────────┘         └──────────┘
 
 Leyenda de pines Teensy 3.0:
-  D0  = Serial1 RX  (del Pin 7 / BCM4 de la Pi)
-  D1  = Serial1 TX  (al Pin 29 / BCM5 de la Pi)
+  D0  = Serial1 RX  (del Pin 32 / GPIO12 de la Pi 5)
+  D1  = Serial1 TX  (al Pin 33 / GPIO13 de la Pi 5)
   D2  = PS_ON vía transistor D882-Y (1k en base)
   D3  = botón/llave con INPUT_PULLUP
   D6  = bypass con INPUT_PULLUP (activo LOW)
@@ -59,8 +61,8 @@ Cambios de cableado respecto de v1.1:
       Teensy D5 ◄── Pi GPIO18 (heartbeat)
 
   v1.1.1-beta: esas dos líneas se retiran. En su lugar:
-      Teensy D0 ◄── Pi pin 7  (BCM4, UART3 TX)
-      Teensy D1 ──► Pi pin 29 (BCM5, UART3 RX)
+      Teensy D0 ◄── Pi pin 32 (GPIO12, uart4-pi5 TX)
+      Teensy D1 ──► Pi pin 33 (GPIO13, uart4-pi5 RX)
 
   D2, D3, D13 y la alimentación no cambian.
 

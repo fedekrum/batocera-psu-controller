@@ -6,9 +6,9 @@ CONTROLADOR DE PSU - VERSION 1.1.1-beta (mismo protocolo que v1.4).
 
 Contrato (ver PROTOCOLO.md):
   - UART principal @ 9600 8N1, raw, \\n por linea
-    ( /dev/ttyAMA3 por default; override PI_SERIAL_DEVICE )
-  - Pi TX (BCM4, pin 7, UART3 TX)  -> Teensy pin 0 (Serial1 RX)
-  - Pi RX (BCM5, pin 29, UART3 RX) <- Teensy pin 1 (Serial1 TX)
+    ( /dev/ttyAMA4 por default; override PI_SERIAL_DEVICE )
+  - Pi TX (BCM8, pin 3, UART4 TX)  -> Teensy pin 0 (Serial1 RX)
+  - Pi RX (BCM9, pin 5, UART4 RX) <- Teensy pin 1 (Serial1 TX)
 
 Mensajes Pi -> controlador: BOOT_OK, ALIVE seq=.. uptime=.., BYE reason=..,
 PONG.
@@ -177,17 +177,19 @@ def _configure_tty(fd: int, baud: int) -> None:
 
 def _resolve_serial_device() -> str:
     """
-    Ruta del UART principal. En este proyecto usamos UART3
-    (GPIO4/5), que aparece como /dev/ttyAMA3 en Pi 4 (BCM2711).
+    Ruta del UART principal. En este proyecto usamos UART4: en Pi 4
+    (BCM2711) sale en GPIO8/9 (pines 3/5) con dtoverlay=uart4, y en Pi 5
+    (BCM2712) en GPIO12/13 (pines 32/33) con dtoverlay=uart4-pi5.
+    En ambos casos el dispositivo es /dev/ttyAMA4.
     Override: PI_SERIAL_DEVICE.
     """
     env = os.environ.get("PI_SERIAL_DEVICE", "").strip()
     if env and os.path.exists(env):
         return env
-    for path in ("/dev/ttyAMA3", "/dev/serial0", "/dev/ttyAMA0", "/dev/ttyS0"):
+    for path in ("/dev/ttyAMA4", "/dev/serial0", "/dev/ttyAMA0", "/dev/ttyS0"):
         if os.path.exists(path):
             return path
-    return "/dev/ttyAMA3"
+    return "/dev/ttyAMA4"
 
 
 def _open_serial_with_retry(device_path: str, logger: logging.Logger) -> int:

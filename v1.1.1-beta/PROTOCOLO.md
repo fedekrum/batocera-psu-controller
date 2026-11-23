@@ -18,8 +18,8 @@ un `pi.py` de v1.4 funciona sin cambios en esta versión.
 | Botón / llave | Pin 3 (`INPUT_PULLUP`) | — | Usuario → Teensy |
 | `PS_ON` de la ATX | Pin 2 (vía transistor) | — | Teensy → PSU |
 | LED de estado | Pin 13 (LED builtin, activo HIGH) | — | — |
-| RX del enlace | **Pin 0** (`Serial1 RX`) | TX: pin 7, BCM4 (UART3_TX) | Pi → Teensy |
-| TX del enlace | **Pin 1** (`Serial1 TX`) | RX: pin 29, BCM5 (UART3_RX) | Teensy → Pi |
+| RX del enlace | **Pin 0** (`Serial1 RX`) | TX: pin 3, BCM8 (UART4_TX) | Pi → Teensy |
+| TX del enlace | **Pin 1** (`Serial1 TX`) | RX: pin 5, BCM9 (UART4_RX) | Teensy → Pi |
 | Bypass | Pin 6 (`INPUT_PULLUP`, activo LOW) | — | Usuario → Teensy |
 | Alimentación | VIN desde +5 V standby (violeta) | — | — |
 | GND común | GND | Pin 6 (o cualquier GND) | — |
@@ -27,6 +27,7 @@ un `pi.py` de v1.4 funciona sin cambios en esta versión.
 - **El Teensy 3.0 no tolera 5 V**: todas las señales son 3,3 V, conexión
   directa sin level-shifter. La Pi 5 también es 3,3 V.
 - Pines 0/1 son UART por hardware (`Serial1`), **fijos en silicio**.
+  En la Pi 5 los pines del enlace son 32/33 (GPIO12/13) con `uart4-pi5`.
   `PIN_SERIAL_RX` y `PIN_SERIAL_TX` sólo aceptan 0 y 1 respectivamente;
   otros valores responden `CFG_ERR fixed pin`.
 - **Backend 0** (`LINK_BACKEND=0`, default): `Serial1` en pines 0/1, el
@@ -36,7 +37,7 @@ un `pi.py` de v1.4 funciona sin cambios en esta versión.
 - Los otros pines (botón, PSU, LED, bypass) sí son configurables por
   `CFG_SET` y se aplican al reiniciar.
 - Las líneas de v1.1 (GPIO18 heartbeat y GPIO17 shutdown) **ya no se usan**:
-  se desconectan y se tienden las dos del UART3.
+  se desconectan y se tienden las dos del UART4 en la Pi.
 
 ## Capa física y robustez
 
@@ -51,13 +52,16 @@ un `pi.py` de v1.4 funciona sin cambios en esta versión.
 
 ## Configuración en la Pi (Batocera)
 
-1. En `/boot/config.txt`: `enable_uart=1`, `dtoverlay=miniuart-bt` y
-   `dtoverlay=uart3` (UART3 en GPIO4/5, pines 7/29). `miniuart-bt`
-   conserva Bluetooth; no usar `disable-bt` si se usan mandos BT.
-2. En `/boot/cmdline.txt`: quitar cualquier `console=serial0,115200` o
-   equivalente.
-3. Reiniciar y verificar que exista `/dev/ttyAMA3` (UART3 en GPIO4/5).
-   `pi.py` lo usa por defecto; se puede forzar con `PI_SERIAL_DEVICE`.
+1. En `/boot/config.txt`: `enable_uart=1` y, según la Pi:
+   - Pi 4: `dtoverlay=uart4` (GPIO8/9, pines 3/5). Se puede mantener
+     `dtoverlay=miniuart-bt` para conservar Bluetooth; no usar
+     `disable-bt` si se usan mandos BT.
+   - Pi 5: `dtoverlay=uart4-pi5` (GPIO12/13, pines 32/33). No existe
+     `miniuart-bt` en Pi 5.
+2. No hace falta quitar `console=serial0,115200` de `/boot/cmdline.txt`:
+   esa consola usa GPIO14/15 (o el header de debug en Pi 5), no este enlace.
+3. Reiniciar y verificar que exista `/dev/ttyAMA4`. `pi.py` lo usa por
+   defecto en ambas Pi; se puede forzar con `PI_SERIAL_DEVICE`.
 4. Instalar `system/pi.py` en `/userdata/system/pi.py` y el launcher
    `system/custom_service` en `/userdata/system/services/custom_service`,
    ambos ejecutables. El log queda en `/userdata/system/pi_power.log`.

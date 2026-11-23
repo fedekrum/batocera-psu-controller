@@ -11,7 +11,8 @@ de los dos pines de heartbeat.
 
 Incluye `diagrama_esp_rpi_psu.txt`, el **mismo diagrama de cableado que v1.2 y
 v1.4** (copiado en cada carpeta). La ESP y la fuente se cablean igual; en el
-lado de la Pi las líneas D5/D7 son UART3 (`BCM4`/`BCM5`) en lugar de los
+lado de la Pi las líneas D5/D7 son UART4 (`BCM8`/`BCM9`, pines 3/5)
+en lugar de los
 pines de heartbeat/shutdown de v1.2.
 
 Incluye además `PROTOCOLO.md`, adaptado del documento del zip

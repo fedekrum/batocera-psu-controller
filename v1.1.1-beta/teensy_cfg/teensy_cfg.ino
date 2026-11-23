@@ -16,8 +16,8 @@
 // Ver PROTOCOLO.md en esta misma carpeta.
 //
 // Cableado con la Pi 5:
-//   Pi pin 7  BCM4 UART3_TX -> Teensy pin 0 (Serial1 RX)
-//   Pi pin 29 BCM5 UART3_RX <- Teensy pin 1 (Serial1 TX)
+//   Pi 5 pin 32 GPIO12 TX (uart4-pi5) -> Teensy pin 0 (Serial1 RX)
+//   Pi 5 pin 33 GPIO13 RX (uart4-pi5) <- Teensy pin 1 (Serial1 TX)
 //   GND comun
 //   Teensy alimentado desde +5V standby ATX (violeta).
 // IMPORTANTE: Teensy 3.0 NO tolera 5V. Usar solo 3,3 V.

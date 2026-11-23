@@ -3,8 +3,8 @@
 // Ver PROTOCOLO.md en esta misma carpeta.
 //
 // Cableado Pi <-> NodeMCU:
-//   Pi pin 7  BCM4 UART3_TX -> D5 (ESP RX en SoftwareSerial)
-//   Pi pin 29 BCM5 UART3_RX <- D7 (ESP TX en SoftwareSerial)
+//   Pi 4 pin 3 BCM8 UART4_TX  -> D5 (ESP RX en SoftwareSerial)
+//   Pi 4 pin 5 BCM9 UART4_RX  <- D7 (ESP TX en SoftwareSerial)
 //   GND común
 //
 // ESP en +5V standby ATX (violeta): vive con PSU principal OFF.

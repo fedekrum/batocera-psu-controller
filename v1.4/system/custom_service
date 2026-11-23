@@ -6,9 +6,10 @@
 
 LOG=/userdata/system/pi_power.log
 BIN=/userdata/system/pi.py
-# UART por defecto del proyecto: UART3 en GPIO4/5 (pines 7/29).
+# UART por defecto: UART4 en GPIO8/9 (pines 3/5) en Pi 4;
+# en Pi 5, uart4-pi5 en GPIO12/13 (pines 32/33). Ambos: /dev/ttyAMA4.
 # Se puede overridear desde entorno.
-SERIAL_DEVICE=${PI_SERIAL_DEVICE:-/dev/ttyAMA3}
+SERIAL_DEVICE=${PI_SERIAL_DEVICE:-/dev/ttyAMA4}
 
 case "$1" in
   start|"")

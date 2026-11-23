@@ -39,31 +39,31 @@ documento o actualizarlo en el mismo commit.
 
 ## Cableado del enlace con la Pi
 
-| Señal | Pi (header 40) | Dirección |
-|---|---|---|
-| TX | pin 7, BCM4 (UART3_TX) | Pi → RX del controlador |
-| RX | pin 29, BCM5 (UART3_RX) | Pi ← TX del controlador |
-| GND | pin 6 (o cualquier GND) | común |
+Hay dos máquinas con cableados distintos; en ambas el dispositivo es
+`/dev/ttyAMA4`, así que `pi.py` no necesita `PI_SERIAL_DEVICE`.
+
+| Máquina | Overlay | Pi TX → RX controlador | Pi RX ← TX controlador | Dispositivo |
+|---|---|---|---|---|
+| Pi 4 + ESP8266 (cableado actual) | `uart4` | pin 3, BCM8 (GPIO8) | pin 5, BCM9 (GPIO9) | `/dev/ttyAMA4` |
+| Pi 5 + Teensy 3.0 (nuevo) | `uart4-pi5` | pin 32, GPIO12 | pin 33, GPIO13 | `/dev/ttyAMA4` |
+
+GND común en cualquier pin GND de la Pi.
 
 En la placa, según el perfil:
 
 ```
-ESP8266 : pin 7 -> D5 (GPIO14)   ·   pin 29 <- D7 (GPIO13)
-ESP32   : pin 7 -> GPIO14        ·   pin 29 <- GPIO13
-Teensy  : pin 7 -> pin 0         ·   pin 29 <- pin 1
+Pi 4 + ESP8266 : pin 3  -> D5 (GPIO14)   ·   pin 5  <- D7 (GPIO13)
+Pi 4 + ESP32   : pin 3  -> GPIO14        ·   pin 5  <- GPIO13
+Pi 5 + Teensy  : pin 32 -> pin 0         ·   pin 33 <- pin 1
 ```
 
 - UART a **9600 8N1**, modo raw, una línea por mensaje terminada en `\n`.
-- `/dev/ttyAMA3` por default en el daemon; se puede forzar con
+- `/dev/ttyAMA4` por default en el daemon; se puede forzar con
   `PI_SERIAL_DEVICE`.
 
-Mapeo real de UARTs en Pi 4 (BCM2711), para no mezclarlos:
-
-| Overlay | GPIO | Pines del header | Dispositivo |
-|---|---|---|---|
-| `uart3` | 4 / 5 | 7 / 29 | `/dev/ttyAMA3` (este proyecto) |
-| `uart4` | 8 / 9 | 3 / 5 | `/dev/ttyAMA4` |
-| `uart5` | 12 / 13 | 32 / 33 | `/dev/ttyAMA5` |
+No confundir los números: en Pi 4 `uart3` son GPIO4/5 (pines 7/29) y
+`uart5` son GPIO12/13 (pines 32/33); en Pi 5 `uart3-pi5` son GPIO8/9
+(pines 3/5). Acá siempre usamos `uart4` / `uart4-pi5` → `/dev/ttyAMA4`.
 
 - **El Teensy 3.0 no tolera 5 V**: señales de 3,3 V, sin level-shifter.
   El +5 V standby de la ATX entra solo por VIN.

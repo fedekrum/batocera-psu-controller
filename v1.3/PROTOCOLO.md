@@ -15,14 +15,14 @@ respecto del original se marcan abajo. La v1.4 tiene su propio contrato.
 
 | Señal | Pi (header 40) | BCM | ESP (NodeMCU) | Dirección |
 |-------|----------------|-----|---------------|-----------|
-| TX Pi → RX ESP | Pin 7 | GPIO 4 (UART3_TX) | D5 (SoftwareSerial RX) | Pi → ESP |
-| RX Pi ← TX ESP | Pin 29 | GPIO 5 (UART3_RX) | D7 (SoftwareSerial TX) | ESP → Pi |
+| TX Pi → RX ESP | Pin 3 | GPIO 8 (UART4_TX) | D5 (SoftwareSerial RX) | Pi → ESP |
+| RX Pi ← TX ESP | Pin 5 | GPIO 9 (UART4_RX) | D7 (SoftwareSerial TX) | ESP → Pi |
 | GND común | Pin 6 (o cualquier GND) | — | GND | — |
 
 - Ambos lados son **3,3 V**: conexión directa, sin level-shifter.
 - ESP sobre +5V standby ATX (violeta): sigue vivo con PSU principal OFF.
-- **No** se usa BCM14 (GPIO14) ni el esquema anterior. El cable viejo
-  de GPIO14 puede retirarse.
+- **No** se usa BCM14 (GPIO14, consola) ni el esquema anterior de 2 GPIOs.
+  El cable viejo de GPIO14 puede retirarse.
 
 ## Parámetros de la capa física
 
@@ -41,15 +41,13 @@ respecto del original se marcan abajo. La v1.4 tiene su propio contrato.
 
 ## Configuración imprescindible en la Pi (Batocera)
 
-1. `/boot/config.txt`: agregar `enable_uart=1`. En Pi 4 usar
-   **`dtoverlay=miniuart-bt`** para mantener Bluetooth y habilitar
-   **`dtoverlay=uart3`** para exponer UART3 en GPIO4/5 (pins 7/29).
-   Solo si **no** necesitas Bluetooth, puedes usar
-   `dtoverlay=disable-bt` (mas simple, pero apaga el BT).
-2. `/boot/cmdline.txt`: **quitar** cualquier
-   `console=serial0,115200` o equivalente (si no, el kernel escupe
-   mensajes por TX al bootear y confunde al ESP).
-3. Reiniciar y verificar que exista `/dev/ttyAMA3` (UART3 en GPIO4/5).
+1. `/boot/config.txt` (Pi 4): agregar `enable_uart=1` y
+   **`dtoverlay=uart4`** para exponer UART4 en GPIO8/9 (pines 3/5).
+   Se puede mantener **`dtoverlay=miniuart-bt`** para conservar
+   Bluetooth; no usar `disable-bt` si se usan mandos BT.
+2. No hace falta quitar `console=serial0,115200` de `/boot/cmdline.txt`:
+   la consola usa GPIO14/15, que no interviene en este enlace UART4.
+3. Reiniciar y verificar que exista `/dev/ttyAMA4` (UART4 en GPIO8/9).
    `pi.py` lo usa por defecto; se puede forzar con `PI_SERIAL_DEVICE`.
 
 ## Protocolo (mensajes de texto terminados en `\n`)
@@ -127,7 +125,7 @@ Códigos visibles en el LED con PSU OFF (codificados por el ESP):
 
 ## Obligaciones del daemon en la Pi
 
-1. Abrir `/dev/ttyAMA3` (UART3 en esta build) a 9600 8N1 y ponerlo en
+1. Abrir `/dev/ttyAMA4` (UART4 en GPIO8/9) a 9600 8N1 y ponerlo en
    modo raw (o el dispositivo indicado en `PI_SERIAL_DEVICE`).
 2. Apenas esté listo: enviar **`LOG_LEVEL <lvl>\n`** con el nivel
    resuelto (`LOG_LEVEL_DEFAULT` en `pi.py`, salvo `--debug` /

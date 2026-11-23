@@ -20,8 +20,8 @@ Igual que v1.2/v1.3 en la parte de la fuente, botón y LED:
 | Botón | D1 = GPIO 5 | GPIO 5 | — | Usuario → ESP |
 | `PS_ON` de la ATX | D2 = GPIO 4 | GPIO 4 | — | ESP → PSU |
 | LED de estado | D4 = GPIO 2 | GPIO 2 | — | — |
-| RX del enlace a pines | D5 = GPIO 14 | GPIO 14 | TX: pin 7, BCM4 (UART3_TX) | Pi → ESP |
-| TX del enlace a pines | D7 = GPIO 13 | GPIO 13 | RX: pin 29, BCM5 (UART3_RX) | ESP → Pi |
+| RX del enlace a pines | D5 = GPIO 14 | GPIO 14 | TX: pin 3, BCM8 (UART4_TX) | Pi → ESP |
+| TX del enlace a pines | D7 = GPIO 13 | GPIO 13 | RX: pin 5, BCM9 (UART4_RX) | ESP → Pi |
 | GND común | GND | GND | Pin 6 (o cualquier GND) | — |
 | Bypass | GPIO 0 (D3, botón FLASH) | GPIO 0 | — | Usuario → ESP |
 
@@ -47,13 +47,16 @@ Igual que v1.2/v1.3 en la parte de la fuente, botón y LED:
 
 ## Configuración en la Pi (Batocera)
 
-1. En `/boot/config.txt`: `enable_uart=1`, `dtoverlay=miniuart-bt` y
-   `dtoverlay=uart3` (UART3 en GPIO4/5, pines 7/29). `miniuart-bt`
-   conserva Bluetooth; no usar `disable-bt` si se usan mandos BT.
-2. En `/boot/cmdline.txt`: quitar cualquier `console=serial0,115200` o
-   equivalente.
-3. Reiniciar y verificar que exista `/dev/ttyAMA3` (UART3 en GPIO4/5).
-   `pi.py` lo usa por defecto; se puede forzar con `PI_SERIAL_DEVICE`.
+1. En `/boot/config.txt`: `enable_uart=1` y, según la Pi:
+   - Pi 4: `dtoverlay=uart4` (GPIO8/9, pines 3/5). Se puede mantener
+     `dtoverlay=miniuart-bt` para conservar Bluetooth; no usar
+     `disable-bt` si se usan mandos BT.
+   - Pi 5: `dtoverlay=uart4-pi5` (GPIO12/13, pines 32/33). No existe
+     `miniuart-bt` en Pi 5.
+2. No hace falta quitar `console=serial0,115200` de `/boot/cmdline.txt`:
+   esa consola usa GPIO14/15 (o el header de debug en Pi 5), no este enlace.
+3. Reiniciar y verificar que exista `/dev/ttyAMA4`. `pi.py` lo usa por
+   defecto en ambas Pi; se puede forzar con `PI_SERIAL_DEVICE`.
 4. Instalar `system/pi.py` en `/userdata/system/pi.py` y el launcher
    `system/custom_service` en `/userdata/system/services/custom_service`,
    ambos ejecutables. El log queda en `/userdata/system/pi_power.log`.

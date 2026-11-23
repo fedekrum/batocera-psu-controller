@@ -43,8 +43,8 @@ LED, bloqueo de `CFG_SET` en bypass) es igual que v1.4.
 ## Cableado mínimo
 
 ```
-Pi pin 7  (BCM4, UART3 TX) ──► Teensy 0 (Serial1 RX)
-Pi pin 29 (BCM5, UART3 RX) ◄── Teensy 1 (Serial1 TX)
+Pi pin 32 (GPIO12, TX) ──► Teensy 0 (Serial1 RX)   [Pi 5, uart4-pi5]
+Pi pin 33 (GPIO13, RX) ◄── Teensy 1 (Serial1 TX)   [Pi 5, uart4-pi5]
 Pi GND                     ─── Teensy GND
 ATX +5VSB (violeta)        ─── Teensy VIN
 ATX GND                    ─── Teensy GND
@@ -72,14 +72,14 @@ flashear nada.
 
 Igual que v1.4:
 
-1. `/boot/config.txt`: `enable_uart=1`, `dtoverlay=miniuart-bt`,
-   `dtoverlay=uart3`.
-2. `/boot/cmdline.txt`: sacar cualquier `console=serial0,115200`.
+1. `/boot/config.txt`: `enable_uart=1`; en Pi 5 agregar
+   `dtoverlay=uart4-pi5` (en Pi 4 sería `dtoverlay=uart4`).
+2. `console=serial0,115200` puede quedarse: usa otros pines.
 3. Copiar `system/pi.py` a `/userdata/system/pi.py` y
    `system/custom_service` a
    `/userdata/system/services/custom_service`, ambos ejecutables.
-4. `PI_SERIAL_DEVICE` permite forzar el dispositivo serie si la build
-   nombra distinto el UART3 (por defecto `/dev/ttyAMA3`).
+4. El daemon abre `/dev/ttyAMA4` por defecto; `PI_SERIAL_DEVICE`
+   permite forzar el dispositivo serie si la build lo nombra distinto.
 
 ## Prueba pendiente
 

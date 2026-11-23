@@ -4,6 +4,25 @@ Registro corto de las decisiones que no son obvias mirando el código.
 Sirve para no repetir discusiones y para entender por qué algunas cosas están
 como están.
 
+## 2026-11-23 — Cableado UART de las dos máquinas
+
+- **Decisión**: dejar `/dev/ttyAMA4` como dispositivo por defecto del daemon
+  en todo el repo. La Pi 4 + ESP8266 conserva su cableado actual con
+  `dtoverlay=uart4` (GPIO8/9, pines físicos 3/5). La Pi 5 + Teensy 3.0 usa
+  `dtoverlay=uart4-pi5` (GPIO12/13, pines físicos 32/33), con TX en pin 32
+  → Teensy 0 y RX en pin 33 ← Teensy 1.
+- **Por qué**: el enlace anterior se documentaba como UART3 (GPIO4/5,
+  pines 7/29) por una Pi 4 con pines quemados que ya no existe. El esquema
+  deployado en la SD era UART4, y el device tree confirma que el overlay 4
+  produce `/dev/ttyAMA4` tanto en BCM2711 como en BCM2712 (vía RP1). Así
+  las dos máquinas usan el mismo dispositivo sin `PI_SERIAL_DEVICE`.
+- **Consecuencia**: `CFG_VERSION`, el firmware y los pines del ESP/Teensy no
+  cambian. Solo cambian documentación, defaults del daemon y el overlay de
+  la Pi 5. La consola `serial0` (GPIO14/15) no interviene.
+- Verificado contra los overlays `uart4`/`uart4-pi5` y los aliases
+  `serial4 = &uart4` del device tree oficial de Raspberry Pi. **Sin probar
+  en hardware**: la SD está expulsada y no se flasheó ni soldó nada.
+
 ## 2026-11-22 — Renumeración de versiones
 
 - **Decisión**: `v1/` → `v1.1/`, `v1.1/` → `v1.1.1-beta/`, `v2/` → `v1.2/`,
@@ -130,6 +149,9 @@ como están.
   1 (TX)**. Estaban libres en v1.1 (que usaba 2, 3, 4, 5 y 13), no requieren
   mover el botón ni el transistor y no dependen de SoftwareSerial. En la
   Pi se mantienen los pines de v1.4: BCM4 TX (pin 7) y BCM5 RX (pin 29).
+  Actualizado el 2026-11-23: esa frase quedó obsoleta; la Pi 5 usa
+  `uart4-pi5` en GPIO12/13 (pines 32/33) y la Pi 4 + ESP8266 conserva
+  `uart4` en GPIO8/9 (pines 3/5). Ambas con `/dev/ttyAMA4`.
   Alternativas descartadas: `Serial3` (pines 7/8) y `Serial2` (9/10),
   que ocupan pines útiles y no aportan ventaja.
 - **Bypass**: pin **6** con `INPUT_PULLUP`, activo LOW, porque el Teensy

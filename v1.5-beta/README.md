@@ -93,9 +93,11 @@ placa conectada.
 ## Cableado del enlace
 
 ```
-Pi pin 7  (BCM4, TX) -> RX del controlador
-Pi pin 29 (BCM5, RX) <- TX del controlador
-Pi GND                 -> GND del controlador
+Pi 4 + ESP8266: pin 3  (BCM8,  TX) -> D5  (RX del controlador)
+Pi 4 + ESP8266: pin 5  (BCM9,  RX) <- D7  (TX del controlador)
+Pi 5 + Teensy : pin 32 (GPIO12,TX) -> pin 0 (Serial1 RX)
+Pi 5 + Teensy : pin 33 (GPIO13,RX) <- pin 1 (Serial1 TX)
+Pi GND                            -> GND del controlador
 ```
 
 Según la placa:
@@ -110,9 +112,10 @@ Según la placa:
 
 Igual que v1.4: copiar `system/pi.py` a `/userdata/system/pi.py` y
 `system/custom_service` a `/userdata/system/services/custom_service`,
-ambos ejecutables. Habilitar `enable_uart=1`, `dtoverlay=miniuart-bt` y
-`dtoverlay=uart3` en `/boot/config.txt`, y quitar cualquier
-`console=serial0,115200` de `/boot/cmdline.txt`.
+ambos ejecutables. En `/boot/config.txt`: `enable_uart=1` y
+`dtoverlay=uart4` en la Pi 4, o `dtoverlay=uart4-pi5` en la Pi 5 (no existe
+`miniuart-bt` en Pi 5). En ambos casos el daemon abre `/dev/ttyAMA4` por
+defecto. La consola `serial0` (GPIO14/15) no interviene.
 
 ## Prueba pendiente
 

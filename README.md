@@ -55,8 +55,9 @@ EEPROM; no confundir con la versión del controlador (v1.4).
 La misma lógica y el mismo protocolo de v1.4, pero en Teensy 3.0. No
 reemplaza a `v1.1/`, que sigue en servicio en el arcade original.
 
-- Serial1 por hardware en pines **0 (RX) y 1 (TX)**; la Pi usa UART3
-  (BCM4/BCM5, pines 7 y 29), igual que v1.4.
+- Serial1 por hardware en pines **0 (RX) y 1 (TX)**; la Pi 5 usa
+  `uart4-pi5` (GPIO12/13, pines 32 y 33), igual dispositivo
+  `/dev/ttyAMA4` que la Pi 4 con ESP8266.
 - Bypass por pin dedicado **6** (no hay botón FLASH).
 - LED en pin 13, activo HIGH; EEPROM emulada por Teensyduino.
 - `ALIVE_TIMEOUT_MS = 60000` **de fábrica** (no depende de un grabado
@@ -86,8 +87,8 @@ modifica v1.4, v1.1.1-beta ni v1.1.
 
 ESP8266 NodeMCU LoLin v3:
 
-- Pi TX (BCM4, pin 7, UART3 TX) -> ESP D5 (RX de SoftwareSerial)
-- Pi RX (BCM5, pin 29, UART3 RX) <- ESP D7 (TX de SoftwareSerial)
+- Pi TX (BCM8, pin 3, UART4 TX) -> ESP D5 (RX de SoftwareSerial)
+- Pi RX (BCM9, pin 5, UART4 RX) <- ESP D7 (TX de SoftwareSerial)
 - GND común
 - ESP alimentado desde +5 V standby ATX (violeta)
 - Bypass: botón FLASH (GPIO0 / D3), toggle por pulsación, solo RAM
@@ -99,8 +100,8 @@ dos líneas D5/D7 entre la ESP y la Pi es el mismo en **v1.2, v1.3 y v1.4**. Cad
 una de esas carpetas incluye su copia de `diagrama_esp_rpi_psu.txt` para
 que sea autocontenida (v1.1 tiene su propio diagrama Teensy). Lo único que
 cambia es el significado de esas dos líneas en el lado de la Pi: en v1.2 son
-`GPIO14`/`GPIO4` (heartbeat y shutdown), mientras que en v1.3 y v1.4 son UART3
-(`BCM4`/`BCM5`, pines 7 y 29).
+`GPIO14`/`GPIO4` (heartbeat y shutdown), mientras que en v1.3 y v1.4 son UART4
+(`BCM8`/`BCM9`, pines 3 y 5).
 
 ## Protocolo
 
@@ -169,7 +170,7 @@ ssh root@<IP-de-la-Pi> reboot
 ```
 
 Arranca `python3 -u /userdata/system/pi.py` con
-`PI_SERIAL_DEVICE` (por defecto `/dev/ttyAMA3`) y escribe el log en
+`PI_SERIAL_DEVICE` (por defecto `/dev/ttyAMA4`) y escribe el log en
 `/userdata/system/pi_power.log`. Copiarlo, darle `chmod +x` y reiniciar.
 Para reiniciar el daemon sin reboot:
 
