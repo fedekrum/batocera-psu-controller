@@ -56,9 +56,8 @@ un `pi.py` de v1.4 funciona sin cambios en esta versión.
    conserva Bluetooth; no usar `disable-bt` si se usan mandos BT.
 2. En `/boot/cmdline.txt`: quitar cualquier `console=serial0,115200` o
    equivalente.
-3. Reiniciar y verificar `/dev/ttyAMA4` o `/dev/ttyAMA3` según la build.
-   `pi.py` usa `/dev/ttyAMA4` por defecto; se puede forzar con
-   `PI_SERIAL_DEVICE`.
+3. Reiniciar y verificar que exista `/dev/ttyAMA3` (UART3 en GPIO4/5).
+   `pi.py` lo usa por defecto; se puede forzar con `PI_SERIAL_DEVICE`.
 4. Instalar `system/pi.py` en `/userdata/system/pi.py` y el launcher
    `system/custom_service` en `/userdata/system/services/custom_service`,
    ambos ejecutables. El log queda en `/userdata/system/pi_power.log`.

@@ -78,8 +78,8 @@ Igual que v1.4:
 3. Copiar `system/pi.py` a `/userdata/system/pi.py` y
    `system/custom_service` a
    `/userdata/system/services/custom_service`, ambos ejecutables.
-4. `PI_SERIAL_DEVICE` permite forzar el dispositivo serie si el nombre
-   no es `/dev/ttyAMA4`.
+4. `PI_SERIAL_DEVICE` permite forzar el dispositivo serie si la build
+   nombra distinto el UART3 (por defecto `/dev/ttyAMA3`).
 
 ## Prueba pendiente
 

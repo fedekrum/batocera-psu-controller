@@ -21,8 +21,8 @@ respecto del original se marcan abajo. La v1.4 tiene su propio contrato.
 
 - Ambos lados son **3,3 V**: conexión directa, sin level-shifter.
 - ESP sobre +5V standby ATX (violeta): sigue vivo con PSU principal OFF.
-- **No** se usa BCM4 ni el esquema anterior. El cable de pin 7 del
-  layout viejo puede retirarse.
+- **No** se usa BCM14 (GPIO14) ni el esquema anterior. El cable viejo
+  de GPIO14 puede retirarse.
 
 ## Parámetros de la capa física
 
@@ -49,10 +49,8 @@ respecto del original se marcan abajo. La v1.4 tiene su propio contrato.
 2. `/boot/cmdline.txt`: **quitar** cualquier
    `console=serial0,115200` o equivalente (si no, el kernel escupe
    mensajes por TX al bootear y confunde al ESP).
-3. Reiniciar. Confirmar con `ls -l /dev/ttyAMA4` o `/dev/ttyAMA3`,
-   según la build de Batocera (el `pi.py` del zip usaba `ttyAMA3`;
-   la copia de este repo usa `/dev/ttyAMA4` por defecto). En cualquier
-   caso se puede forzar con `PI_SERIAL_DEVICE`.
+3. Reiniciar y verificar que exista `/dev/ttyAMA3` (UART3 en GPIO4/5).
+   `pi.py` lo usa por defecto; se puede forzar con `PI_SERIAL_DEVICE`.
 
 ## Protocolo (mensajes de texto terminados en `\n`)
 
@@ -129,7 +127,7 @@ Códigos visibles en el LED con PSU OFF (codificados por el ESP):
 
 ## Obligaciones del daemon en la Pi
 
-1. Abrir `/dev/ttyAMA4` (UART3 en esta build) a 9600 8N1 y ponerlo en
+1. Abrir `/dev/ttyAMA3` (UART3 en esta build) a 9600 8N1 y ponerlo en
    modo raw (o el dispositivo indicado en `PI_SERIAL_DEVICE`).
 2. Apenas esté listo: enviar **`LOG_LEVEL <lvl>\n`** con el nivel
    resuelto (`LOG_LEVEL_DEFAULT` en `pi.py`, salvo `--debug` /

@@ -54,8 +54,17 @@ Teensy  : pin 7 -> pin 0         ·   pin 29 <- pin 1
 ```
 
 - UART a **9600 8N1**, modo raw, una línea por mensaje terminada en `\n`.
-- `/dev/ttyAMA4` por default en el daemon; se puede forzar con
+- `/dev/ttyAMA3` por default en el daemon; se puede forzar con
   `PI_SERIAL_DEVICE`.
+
+Mapeo real de UARTs en Pi 4 (BCM2711), para no mezclarlos:
+
+| Overlay | GPIO | Pines del header | Dispositivo |
+|---|---|---|---|
+| `uart3` | 4 / 5 | 7 / 29 | `/dev/ttyAMA3` (este proyecto) |
+| `uart4` | 8 / 9 | 3 / 5 | `/dev/ttyAMA4` |
+| `uart5` | 12 / 13 | 32 / 33 | `/dev/ttyAMA5` |
+
 - **El Teensy 3.0 no tolera 5 V**: señales de 3,3 V, sin level-shifter.
   El +5 V standby de la ATX entra solo por VIN.
 - Las líneas GPIO viejas del cableado de v1.1 (GPIO17/GPIO18) ya no se usan.

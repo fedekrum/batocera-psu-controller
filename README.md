@@ -169,7 +169,7 @@ ssh root@<IP-de-la-Pi> reboot
 ```
 
 Arranca `python3 -u /userdata/system/pi.py` con
-`PI_SERIAL_DEVICE` (por defecto `/dev/ttyAMA4`) y escribe el log en
+`PI_SERIAL_DEVICE` (por defecto `/dev/ttyAMA3`) y escribe el log en
 `/userdata/system/pi_power.log`. Copiarlo, darle `chmod +x` y reiniciar.
 Para reiniciar el daemon sin reboot:
 
