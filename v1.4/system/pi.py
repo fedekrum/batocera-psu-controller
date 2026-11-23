@@ -265,14 +265,22 @@ def _read_lines(fd: int, buf: bytearray) -> list[str]:
 def _execute_shutdown(logger: logging.Logger) -> None:
     logger.warning("Ejecutando apagado ordenado...")
     try:
-        subprocess.run(
+        proc = subprocess.run(
             ["batocera-es-swissknife", "--shutdown"],
-            check=True,
+            check=False,
         )
-        return
-    except (FileNotFoundError, subprocess.CalledProcessError) as exc:
+    except FileNotFoundError as exc:
+        logger.warning("batocera-es-swissknife no encontrado (%s). shutdown -h now.", exc)
+    else:
+        # batocera-es-swissknife --shutdown devuelve 11 por diseño cuando
+        # ya lanzó el apagado de Batocera/ES; 10 aparece en el camino reboot.
+        # No tratarlos como fallo: el fallback haría un segundo shutdown.
+        if proc.returncode in (0, 10, 11):
+            logger.info("batocera-es-swissknife --shutdown rc=%s (esperado)", proc.returncode)
+            return
         logger.warning(
-            "batocera-es-swissknife fallo (%s). shutdown -h now.", exc
+            "batocera-es-swissknife fallo (rc=%s). shutdown -h now.",
+            proc.returncode,
         )
     try:
         subprocess.run(["shutdown", "-h", "now"], check=False)
