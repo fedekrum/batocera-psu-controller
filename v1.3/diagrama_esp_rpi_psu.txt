@@ -13,7 +13,7 @@ Diagrama:
 ═════════════════════════════════
 
 
-            PC ATX PSU             ESP8266                     Button  
+            PC ATX PSU             ESP8266                    Power Button  
             ┌──────────────┐       ┌──────────────────┐         ┌─────┐ 
   220 AC  → │  +5VSB(VIO)  ├───────┤ VIN          GND ├─────────┤     │ 
             │              │       │                  │         │     │ 
